@@ -1,56 +1,78 @@
 import { useEffect, useRef, useState } from "react";
 import "./Baraat.css";
 
-function Baraat() {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+const EVENT_DATE = new Date("2026-10-31T22:00:00+05:00").getTime();
+const MUSIC_VIDEO_ID = "qtz5mpvgAM0";
 
+function Baraat() {
+  const [invitationOpen, setInvitationOpen] = useState(false);
   const [scratched, setScratched] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
 
+  const [timeLeft, setTimeLeft] = useState({
+    days: "00",
+    hours: "00",
+    minutes: "00",
+    seconds: "00",
+  });
+
   const canvasRef = useRef(null);
   const playerRef = useRef(null);
+  const scratchingRef = useRef(false);
+  const musicStartedRef = useRef(false);
+  const scratchCanvasReadyRef = useRef(false);
 
-  // ==========================================
-  // YOUTUBE MUSIC
-  // ==========================================
+  /* ---------------- OPEN INVITATION + MUSIC ---------------- */
+
+  const openInvitation = () => {
+    setInvitationOpen(true);
+
+    if (playerRef.current) {
+      try {
+        playerRef.current.seekTo(30, true);
+        playerRef.current.playVideo();
+        musicStartedRef.current = true;
+        setMusicPlaying(true);
+      } catch (error) {
+        console.log("Music could not start:", error);
+      }
+    }
+  };
+
+  /* ---------------- YOUTUBE MUSIC ---------------- */
 
   useEffect(() => {
     const createPlayer = () => {
-      if (!window.YT || !window.YT.Player || playerRef.current) {
-        return;
-      }
+      if (!window.YT || !window.YT.Player) return;
 
       playerRef.current = new window.YT.Player("youtube-player", {
         height: "1",
         width: "1",
-        videoId: "qtz5mpvgAM0",
-
+        videoId: MUSIC_VIDEO_ID,
         playerVars: {
           autoplay: 0,
           controls: 0,
-          start: 30,
           rel: 0,
+          playsinline: 1,
+          start: 30,
           modestbranding: 1,
         },
-
         events: {
           onReady: (event) => {
             event.target.seekTo(30, true);
+            event.target.setVolume(80);
           },
-
           onStateChange: (event) => {
-            if (event.data === window.YT.PlayerState.PLAYING) {
+            if (
+              window.YT &&
+              event.data === window.YT.PlayerState.PLAYING
+            ) {
               setMusicPlaying(true);
             }
 
             if (
-              event.data === window.YT.PlayerState.PAUSED ||
-              event.data === window.YT.PlayerState.ENDED
+              window.YT &&
+              event.data === window.YT.PlayerState.PAUSED
             ) {
               setMusicPlaying(false);
             }
@@ -59,775 +81,607 @@ function Baraat() {
       });
     };
 
-    const loadYouTubeAPI = () => {
-      if (window.YT && window.YT.Player) {
-        createPlayer();
-        return;
-      }
-
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+    } else {
       window.onYouTubeIframeAPIReady = createPlayer;
 
-      const existingScript = document.querySelector(
-        'script[src="https://www.youtube.com/iframe_api"]'
-      );
-
-      if (!existingScript) {
+      if (!document.getElementById("youtube-api")) {
         const script = document.createElement("script");
-
+        script.id = "youtube-api";
         script.src = "https://www.youtube.com/iframe_api";
-
         document.body.appendChild(script);
       }
-    };
-
-    loadYouTubeAPI();
+    }
 
     return () => {
-      if (playerRef.current) {
-        playerRef.current.destroy();
-        playerRef.current = null;
-      }
+      window.onYouTubeIframeAPIReady = null;
     };
   }, []);
 
-  const toggleMusic = () => {
-    if (!playerRef.current || !window.YT) {
-      return;
-    }
+  const toggleMusic = (event) => {
+    event.stopPropagation();
 
-    const state = playerRef.current.getPlayerState();
+    if (!playerRef.current) return;
 
-    if (state === window.YT.PlayerState.PLAYING) {
-      playerRef.current.pauseVideo();
-      setMusicPlaying(false);
-    } else {
-      playerRef.current.seekTo(30, true);
-      playerRef.current.playVideo();
-      setMusicPlaying(true);
+    try {
+      if (musicPlaying) {
+        playerRef.current.pauseVideo();
+        setMusicPlaying(false);
+      } else {
+        if (!musicStartedRef.current) {
+          playerRef.current.seekTo(30, true);
+          musicStartedRef.current = true;
+        }
+
+        playerRef.current.playVideo();
+        setMusicPlaying(true);
+      }
+    } catch (error) {
+      console.log("Music control error:", error);
     }
   };
 
-  // ==========================================
-  // COUNTDOWN
-  // ==========================================
+  /* ---------------- COUNTDOWN ---------------- */
 
   useEffect(() => {
-    const target = new Date(
-      "2026-10-31T22:00:00+05:00"
-    );
-
     const updateCountdown = () => {
-      const now = new Date();
-      const difference = target - now;
+      const difference = EVENT_DATE - Date.now();
 
       if (difference <= 0) {
         setTimeLeft({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
+          days: "00",
+          hours: "00",
+          minutes: "00",
+          seconds: "00",
         });
-
         return;
       }
 
+      const days = Math.floor(
+        difference / (1000 * 60 * 60 * 24)
+      );
+
+      const hours = Math.floor(
+        (difference / (1000 * 60 * 60)) % 24
+      );
+
+      const minutes = Math.floor(
+        (difference / (1000 * 60)) % 60
+      );
+
+      const seconds = Math.floor(
+        (difference / 1000) % 60
+      );
+
       setTimeLeft({
-        days: Math.floor(
-          difference / (1000 * 60 * 60 * 24)
-        ),
-
-        hours: Math.floor(
-          (difference / (1000 * 60 * 60)) % 24
-        ),
-
-        minutes: Math.floor(
-          (difference / (1000 * 60)) % 60
-        ),
-
-        seconds: Math.floor(
-          (difference / 1000) % 60
-        ),
+        days: String(days).padStart(2, "0"),
+        hours: String(hours).padStart(2, "0"),
+        minutes: String(minutes).padStart(2, "0"),
+        seconds: String(seconds).padStart(2, "0"),
       });
     };
 
     updateCountdown();
 
-    const interval = setInterval(
-      updateCountdown,
-      1000
-    );
+    const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // ==========================================
-  // SCRATCH CARD
-  // ==========================================
+  /* ---------------- SCRATCH CARD ---------------- */
 
   useEffect(() => {
+    if (!invitationOpen || scratched) return;
+
     const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    if (!canvas) {
-      return;
-    }
+    const container = canvas.parentElement;
 
-    const ctx = canvas.getContext("2d");
-
-    const resizeCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
-
+    const setupCanvas = () => {
+      const rect = container.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
 
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
 
-      ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-      );
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
 
-      ctx.globalCompositeOperation =
-        "source-over";
+      const ctx = canvas.getContext("2d");
 
-      // Scratch card base
-      ctx.fillStyle = "#b79b78";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      ctx.fillRect(
-        0,
-        0,
-        rect.width,
-        rect.height
-      );
+      ctx.globalCompositeOperation = "source-over";
 
-      // Decorative texture
-      ctx.fillStyle = "#d8c3a3";
+      ctx.fillStyle = "#7d252b";
+      ctx.fillRect(0, 0, rect.width, rect.height);
 
-      for (
-        let x = 0;
-        x < rect.width;
-        x += 18
-      ) {
-        for (
-          let y = 0;
-          y < rect.height;
-          y += 18
-        ) {
-          ctx.fillRect(
-            x,
-            y,
-            7,
-            7
-          );
-        }
-      }
-
-      // Scratch message
-      ctx.fillStyle = "#fffaf3";
-
-      ctx.font =
-        "600 15px Montserrat, sans-serif";
-
+      ctx.fillStyle = "#d8bd7a";
+      ctx.font = "600 15px Montserrat, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-
       ctx.fillText(
-        "Gently scratch to reveal",
+        "SCRATCH TO REVEAL",
         rect.width / 2,
-        rect.height / 2 - 12
+        rect.height / 2
       );
 
-      ctx.font =
-        "400 12px Montserrat, sans-serif";
+      ctx.globalCompositeOperation = "destination-out";
 
-      ctx.fillText(
-        "our special day",
-        rect.width / 2,
-        rect.height / 2 + 12
-      );
+      scratchCanvasReadyRef.current = true;
     };
 
-    resizeCanvas();
+    setupCanvas();
 
-    window.addEventListener(
-      "resize",
-      resizeCanvas
-    );
+    const handleResize = () => {
+      if (!scratchingRef.current) {
+        setupCanvas();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener(
-        "resize",
-        resizeCanvas
-      );
+      window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [invitationOpen, scratched]);
 
-  const scratch = (event) => {
-    if (scratched) {
-      return;
-    }
-
+  const scratchAt = (clientX, clientY) => {
     const canvas = canvasRef.current;
 
-    if (!canvas) {
+    if (!canvas || scratched || !scratchCanvasReadyRef.current) {
       return;
     }
 
-    const rect =
-      canvas.getBoundingClientRect();
-
-    const ctx = canvas.getContext("2d");
-
-    let clientX;
-    let clientY;
-
-    if (
-      event.touches &&
-      event.touches.length > 0
-    ) {
-      clientX =
-        event.touches[0].clientX;
-
-      clientY =
-        event.touches[0].clientY;
-    } else {
-      clientX = event.clientX;
-      clientY = event.clientY;
-    }
-
-    if (
-      clientX === undefined ||
-      clientY === undefined
-    ) {
-      return;
-    }
+    const rect = canvas.getBoundingClientRect();
 
     const x = clientX - rect.left;
     const y = clientY - rect.top;
 
-    ctx.globalCompositeOperation =
-      "destination-out";
+    const ctx = canvas.getContext("2d");
+
+    ctx.save();
+
+    ctx.globalCompositeOperation = "destination-out";
 
     ctx.beginPath();
-
-    ctx.arc(
-      x,
-      y,
-      38,
-      0,
-      Math.PI * 2
-    );
-
+    ctx.arc(x, y, 28, 0, Math.PI * 2);
     ctx.fill();
 
-    // Reveal after the user has scratched
-    // enough of the card.
-    setTimeout(() => {
-      setScratched(true);
-    }, 1500);
+    ctx.restore();
+
+    checkScratchProgress();
   };
 
-  // ==========================================
-  // GOOGLE CALENDAR
-  // ==========================================
+  const checkScratchProgress = () => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    const sampleWidth = 80;
+    const sampleHeight = 40;
+
+    const scaleX = canvas.width / sampleWidth;
+    const scaleY = canvas.height / sampleHeight;
+
+    let transparent = 0;
+    let total = 0;
+
+    for (let y = 0; y < sampleHeight; y++) {
+      for (let x = 0; x < sampleWidth; x++) {
+        const realX = Math.floor(x * scaleX);
+        const realY = Math.floor(y * scaleY);
+
+        const pixel = ctx.getImageData(
+          realX,
+          realY,
+          1,
+          1
+        ).data;
+
+        total++;
+
+        if (pixel[3] < 80) {
+          transparent++;
+        }
+      }
+    }
+
+    const percentage = (transparent / total) * 100;
+
+    if (percentage >= 45) {
+      setScratched(true);
+      scratchingRef.current = false;
+    }
+  };
+
+  const handlePointerDown = (event) => {
+    event.preventDefault();
+
+    scratchingRef.current = true;
+
+    scratchAt(event.clientX, event.clientY);
+  };
+
+  const handlePointerMove = (event) => {
+    if (!scratchingRef.current) return;
+
+    event.preventDefault();
+
+    scratchAt(event.clientX, event.clientY);
+  };
+
+  const handlePointerUp = () => {
+    scratchingRef.current = false;
+  };
+
+  /* ---------------- CALENDAR ---------------- */
 
   const addToCalendar = () => {
-    const event = {
-      title: "Baraat Ceremony",
+    const title = "Baraat Ceremony";
 
-      location:
-        "The Manor Banquet, Shahra-e-Faisal, Darwaish Colony, Karachi",
+    const details = [
+      "Arrival Of Baraat — 09:00 PM",
+      "Dinner — 10:00 PM",
+      "Rukhsati — 11:00 PM",
+      "",
+      "Your presence, love and blessings are more than enough for us.",
+      "",
+      "No Box Gifts Please.",
+    ].join("\n");
 
-      start: "20261031T210000",
+    const location =
+      "The Manor Banquet, Shahra-e-Faisal, Darwaish Colony, Karachi";
 
-      end: "20261031T235900",
+    const start = "20261031T210000";
+    const end = "20261031T235900";
 
-      timezone: "Asia/Karachi",
-    };
-
-    const details = `
-Baraat Ceremony
-
-Arrival Of Baraat — 09:00 PM
-Dinner — 10:00 PM
-Rukhsati — 11:00 PM
-
-No Box Gifts Please.
-Your presence, love and blessings are more than enough for us.
-`;
-
-    const url =
-      `https://www.google.com/calendar/render?action=TEMPLATE` +
-      `&text=${encodeURIComponent(event.title)}` +
-      `&dates=${event.start}/${event.end}` +
+    const calendarUrl =
+      "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+      `&text=${encodeURIComponent(title)}` +
+      `&dates=${start}/${end}` +
       `&details=${encodeURIComponent(details)}` +
-      `&location=${encodeURIComponent(event.location)}` +
-      `&ctz=${encodeURIComponent(event.timezone)}` +
-      `&trp=true`;
+      `&location=${encodeURIComponent(location)}` +
+      "&ctz=Asia/Karachi";
 
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    window.open(calendarUrl, "_blank");
   };
 
-  // ==========================================
-  // PAGE
-  // ==========================================
+  /* ---------------- OPENING COVER ---------------- */
+
+  if (!invitationOpen) {
+    return (
+      <main className="opening-screen">
+        <div id="youtube-player" className="youtube-player" />
+
+        <div className="opening-decoration top-decoration">
+          ❦
+        </div>
+
+        <div className="opening-content">
+          <p className="opening-small">
+            THE WEDDING CELEBRATION
+          </p>
+
+          <div className="opening-symbol">❦</div>
+
+          <h1 className="opening-title">BARAAT</h1>
+
+          <p className="opening-subtitle">
+            A Celebration of Love
+          </p>
+
+          <button
+            className="tap-open-button"
+            onClick={openInvitation}
+          >
+            TAP TO OPEN
+          </button>
+        </div>
+
+        <div className="opening-decoration bottom-decoration">
+          ❦
+        </div>
+      </main>
+    );
+  }
+
+  /* ---------------- INVITATION ---------------- */
 
   return (
-    <div className="baraat-page">
-
-      {/* ======================================
-          HIDDEN YOUTUBE PLAYER
-      ====================================== */}
-
-      <div
-        id="youtube-player"
-        style={{
-          position: "fixed",
-          width: "1px",
-          height: "1px",
-          opacity: 0,
-          pointerEvents: "none",
-          left: "-10px",
-          top: "-10px",
-        }}
-      />
-
-      {/* ======================================
-          MUSIC BUTTON
-      ====================================== */}
+    <main className="baraat-page invitation-open">
+      <div id="youtube-player" className="youtube-player" />
 
       <button
         className={`music-button ${
-          musicPlaying
-            ? "music-playing"
-            : ""
+          musicPlaying ? "playing" : ""
         }`}
         onClick={toggleMusic}
         aria-label={
-          musicPlaying
-            ? "Pause music"
-            : "Play music"
+          musicPlaying ? "Pause music" : "Play music"
         }
       >
-        {musicPlaying
-          ? "♫ MUSIC ON"
-          : "♫ PLAY MUSIC"}
+        {musicPlaying ? "❚❚" : "♫"}
       </button>
 
-      {/* ======================================
-          HERO
-      ====================================== */}
+      {/* CURTAINS */}
 
-      <section className="hero">
+      <div className="opening-curtain curtain-opened">
+        <div className="curtain-panel curtain-left" />
+        <div className="curtain-panel curtain-right" />
 
-        <div className="hero-content">
-
-          <div className="bismillah">
-            ﷽
+        <div className="curtain-centre-text">
+          <div className="curtain-small">
+            WITH LOVE & BLESSINGS
           </div>
 
-          <p className="parents">
-            <strong>
-              Mr & Mrs Advocate Ashraf Ali
-            </strong>
-          </p>
+          <div className="curtain-title">BARAAT</div>
 
-          <p className="grandparents">
-            <strong>
-              Granddaughter of Mr & Mrs Sheikh Abdul Latif (Late)
+          <div className="curtain-line" />
+        </div>
+      </div>
+
+      {/* HERO */}
+
+      <section className="hero-section">
+        <div className="hero-border">
+          <div className="hero-inner">
+            <div className="family-name">
+              Mr & Mrs Advocate Ashraf Ali
+            </div>
+
+            <p className="family-line">
+              Granddaughter of Mr & Mrs Sheikh Abdul Latif
+              (Late)
               <br />
               & Mr & Mrs. Wasi Uddin Warsi (Late)
-            </strong>
-          </p>
+            </p>
 
-          <p className="invite-text">
-            Cordially Invite You To The
-          </p>
+            <div className="invite-line">
+              Cordially Invite You To The
+            </div>
 
-          <h1>
-            BARAAT
-            <span>CEREMONY</span>
-          </h1>
+            <h1 className="baraat-title">
+              BARAAT CEREMONY
+            </h1>
 
-          <p className="daughter-text">
-            Of Their Beloved Daughter
-          </p>
+            <div className="title-divider">
+              <span />
+              <span className="diamond">◆</span>
+              <span />
+            </div>
 
-          {/* ==================================
-              BRIDE & GROOM IMAGES
-          ================================== */}
+            <div className="beloved-line">
+              Of Their Beloved Daughter
+            </div>
 
-          <div className="couple-visuals">
+            {/* PLAIN PHOTOS — NO BOXES */}
 
-            <div className="person">
-
-              <div className="person-frame">
-
+            <div className="couple-visuals">
+              <div className="person">
                 <img
                   src="/images/baraat-bride.png"
                   alt="Bride"
                   className="person-image"
                 />
-
               </div>
 
-            </div>
+              <div className="couple-ampersand">
+                &
+              </div>
 
-            <div className="couple-ampersand">
-              &
-            </div>
-
-            <div className="person">
-
-              <div className="person-frame">
-
+              <div className="person">
                 <img
                   src="/images/baraat-groom.png"
                   alt="Groom"
                   className="person-image"
                 />
-
               </div>
-
             </div>
 
-          </div>
+            {/* SCRATCH DATE */}
 
-          <div className="ornament">
-            ❦
-          </div>
+            <div className="date-reveal-area">
+              {!scratched ? (
+                <div className="scratch-wrapper">
+                  <div className="hidden-date">
+                    <div className="date-day">
+                      31 OCTOBER 2026
+                    </div>
 
-        </div>
+                    <div className="date-weekday">
+                      SATURDAY
+                    </div>
+                  </div>
 
-      </section>
+                  <canvas
+                    ref={canvasRef}
+                    className="scratch-canvas"
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                  />
+                </div>
+              ) : (
+                <div className="revealed-date">
+                  <div className="revealed-date-main">
+                    31 OCTOBER 2026
+                  </div>
 
-      {/* ======================================
-          DATE
-      ====================================== */}
-
-      <section className="date-section">
-
-        <div className="ornament-small">
-          ✦
-        </div>
-
-        <p className="section-label">
-          A DATE TO REMEMBER
-        </p>
-
-        <h2>
-          Scratch to Reveal
-        </h2>
-
-        <div
-          className={`scratch-card ${
-            scratched
-              ? "is-scratched"
-              : ""
-          }`}
-        >
-
-          <div className="revealed-date">
-
-            <strong>
-              31 OCTOBER 2026
-            </strong>
-
-            <span>
-              SATURDAY
-            </span>
-
-          </div>
-
-          <canvas
-            ref={canvasRef}
-            onMouseDown={scratch}
-            onMouseMove={(event) => {
-              if (event.buttons === 1) {
-                scratch(event);
-              }
-            }}
-            onTouchStart={scratch}
-            onTouchMove={scratch}
-          />
-
-          {!scratched && (
-            <div className="scratch-overlay">
-
-              <span>
-                Gently scratch the card to reveal
-                our special day
-              </span>
-
+                  <div className="revealed-date-day">
+                    SATURDAY
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-
+          </div>
         </div>
-
-        <p className="save-date">
-          SAVE THE DATE
-        </p>
-
       </section>
 
-      {/* ======================================
-          COUNTDOWN
-      ====================================== */}
+      {/* COUNTDOWN — SEPARATE FROM SCRATCH */}
 
       <section className="countdown-section">
+        <div className="section-heading">
+          <span />
+          <h2>COUNTDOWN</h2>
+          <span />
+        </div>
 
-        <p className="section-label">
-          THE BARAAT
-        </p>
-
-        <h2>
-          Counting The Moments
-        </h2>
-
-        <div className="countdown">
-
+        <div className="countdown-grid">
           <div className="countdown-item">
-            <strong>
-              {timeLeft.days}
-            </strong>
-
-            <span>
-              DAYS
-            </span>
+            <strong>{timeLeft.days}</strong>
+            <span>DAYS</span>
           </div>
 
           <div className="countdown-item">
-            <strong>
-              {timeLeft.hours}
-            </strong>
-
-            <span>
-              HOURS
-            </span>
+            <strong>{timeLeft.hours}</strong>
+            <span>HOURS</span>
           </div>
 
           <div className="countdown-item">
-            <strong>
-              {timeLeft.minutes}
-            </strong>
-
-            <span>
-              MINUTES
-            </span>
+            <strong>{timeLeft.minutes}</strong>
+            <span>MINUTES</span>
           </div>
 
           <div className="countdown-item">
-            <strong>
-              {timeLeft.seconds}
-            </strong>
-
-            <span>
-              SECONDS
-            </span>
+            <strong>{timeLeft.seconds}</strong>
+            <span>SECONDS</span>
           </div>
-
         </div>
 
-        <div className="ornament">
-          ❧
-        </div>
-
-      </section>
-
-      {/* ======================================
-          VENUE
-      ====================================== */}
-
-      <section className="venue-section">
-
-        <p className="section-label">
-          THE VENUE
-        </p>
-
-        <h2>
-          The Manor Banquet
-        </h2>
-
-        <p>
-          Shahra-e-Faisal
-          <br />
-          Darwaish Colony
-          <br />
-          Karachi
-        </p>
-
-        <a
-          href="https://maps.app.goo.gl/9kn7oBToppmW7R9f6"
-          target="_blank"
-          rel="noreferrer"
-          className="directions"
-        >
-          ⌖ GET DIRECTIONS →
-        </a>
-
-      </section>
-
-      {/* ======================================
-          PROGRAMME
-      ====================================== */}
-
-      <section className="programme-section">
-
-        <p className="section-label">
-          PROGRAMME
-        </p>
-
-        <h2>
-          Evening Details
-        </h2>
-
-        <div className="programme-list">
-
-          <div>
-            <span>
-              Arrival Of Baraat
-            </span>
-
-            <strong>
-              09:00 PM
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Dinner
-            </span>
-
-            <strong>
-              10:00 PM
-            </strong>
-          </div>
-
-          <div>
-            <span>
-              Rukhsati
-            </span>
-
-            <strong>
-              11:00 PM
-            </strong>
-          </div>
-
-        </div>
-
-        <div className="ornament-small">
-          ✦
-        </div>
-
-      </section>
-
-      {/* ======================================
-          WELCOME
-      ====================================== */}
-
-      <section className="welcome-section">
-
-        <p className="section-label">
-          AWAITING TO WELCOME
-        </p>
-
-        <h2>
-          OUR BELOVED FAMILY & FRIENDS
-        </h2>
-
-        <p>
-          Your presence, prayers and blessings
-          <br />
-          will make our celebration even more special.
-        </p>
-
-        <h3>
-          Awaiting to Welcome
-        </h3>
-
-        <h2>
-          Mr & Mrs Advocate Ashraf Ali
-        </h2>
-
-      </section>
-
-      {/* ======================================
-          RSVP
-      ====================================== */}
-
-      <section className="rsvp-section">
-
-        <p className="section-label">
-          RSVP
-        </p>
-
-        <p>
-          FOR ANY ASSISTANCE
-        </p>
-
-        <h3>
-          Advocate Ashraf Ali
-        </h3>
-
-        <a href="tel:+923342595325">
-          03342595325
-        </a>
-
-        <div className="ornament">
-          ❦
-        </div>
-
-      </section>
-
-      {/* ======================================
-          CALENDAR + GIFT MESSAGE
-      ====================================== */}
-
-      {scratched && (
-        <div className="calendar-box">
-
+        <div className="after-countdown">
           <button
+            className="calendar-button"
             onClick={addToCalendar}
           >
             ADD TO CALENDAR
           </button>
 
           <div className="gift-message">
-
-            <strong>
+            <div className="gift-title">
               NO BOX GIFTS PLEASE
-            </strong>
+            </div>
 
             <p>
-              Your presence, love and blessings
-              are more than enough for us.
+              Your presence, love and blessings are more
+              than enough for us.
             </p>
-
           </div>
-
         </div>
-      )}
-
-      {/* ======================================
-          FOOTER
-      ====================================== */}
-
-      <section className="footer-section">
-
-        <p>
-          WITH LOVE & BLESSINGS
-        </p>
-
       </section>
 
-    </div>
+      {/* VENUE */}
+
+      <section className="venue-section">
+        <div className="section-heading light">
+          <span />
+          <h2>THE VENUE</h2>
+          <span />
+        </div>
+
+        <div className="venue-content">
+          <h3>The Manor Banquet</h3>
+
+          <p>
+            Shahra-e-Faisal
+            <br />
+            Darwaish Colony
+            <br />
+            Karachi
+          </p>
+
+          <a
+            href="https://maps.app.goo.gl/9kn7oBToppmW7R9f6"
+            target="_blank"
+            rel="noreferrer"
+            className="directions-button"
+          >
+            GET DIRECTIONS
+          </a>
+        </div>
+      </section>
+
+      {/* PROGRAMME */}
+
+      <section className="programme-section">
+        <div className="section-heading">
+          <span />
+          <h2>PROGRAMME</h2>
+          <span />
+        </div>
+
+        <div className="programme-list">
+          <div className="programme-row">
+            <span>Arrival Of Baraat</span>
+            <strong>09:00 PM</strong>
+          </div>
+
+          <div className="programme-row">
+            <span>Dinner</span>
+            <strong>10:00 PM</strong>
+          </div>
+
+          <div className="programme-row">
+            <span>Rukhsati</span>
+            <strong>11:00 PM</strong>
+          </div>
+        </div>
+      </section>
+
+      {/* WELCOME */}
+
+      <section className="welcome-section">
+        <div className="section-heading">
+          <span />
+          <h2>WELCOME</h2>
+          <span />
+        </div>
+
+        <p>
+          Mr & Mrs Advocate Ashraf Ali
+          <br />
+          request the pleasure of your company
+          <br />
+          on this joyous occasion.
+        </p>
+      </section>
+
+      {/* RSVP */}
+
+      <section className="rsvp-section">
+        <div className="section-heading">
+          <span />
+          <h2>RSVP</h2>
+          <span />
+        </div>
+
+        <p className="rsvp-name">
+          Advocate Ashraf Ali
+        </p>
+
+        <a
+          href="tel:+923342595325"
+          className="rsvp-phone"
+        >
+          03342595325
+        </a>
+      </section>
+
+      {/* FOOTER */}
+
+      <footer className="footer-section">
+        <div className="footer-line" />
+
+        <p>WITH LOVE & BLESSINGS</p>
+
+        <div className="footer-line" />
+      </footer>
+    </main>
   );
 }
 
