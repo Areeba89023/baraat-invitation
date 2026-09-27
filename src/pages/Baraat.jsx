@@ -1,3 +1,4 @@
+```jsx
 import { useEffect, useRef, useState } from "react";
 import "./Baraat.css";
 
@@ -10,9 +11,92 @@ function Baraat() {
   });
 
   const [scratched, setScratched] = useState(false);
-  const canvasRef = useRef(null);
-  const audioRef = useRef(null);
+  const [musicPlaying, setMusicPlaying] = useState(false);
 
+  const canvasRef = useRef(null);
+  const playerRef = useRef(null);
+
+  // YouTube music
+  useEffect(() => {
+    const loadYouTubeAPI = () => {
+      if (window.YT && window.YT.Player) {
+        createPlayer();
+        return;
+      }
+
+      window.onYouTubeIframeAPIReady = createPlayer;
+
+      const existingScript = document.querySelector(
+        'script[src="https://www.youtube.com/iframe_api"]'
+      );
+
+      if (!existingScript) {
+        const script = document.createElement("script");
+        script.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(script);
+      }
+    };
+
+    const createPlayer = () => {
+      if (playerRef.current) return;
+
+      playerRef.current = new window.YT.Player("youtube-player", {
+        height: "1",
+        width: "1",
+        videoId: "qtz5mpvgAM0",
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          start: 30,
+          rel: 0,
+          modestbranding: 1,
+        },
+        events: {
+          onReady: (event) => {
+            event.target.seekTo(30, true);
+          },
+          onStateChange: (event) => {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              setMusicPlaying(true);
+            }
+
+            if (
+              event.data === window.YT.PlayerState.PAUSED ||
+              event.data === window.YT.PlayerState.ENDED
+            ) {
+              setMusicPlaying(false);
+            }
+          },
+        },
+      });
+    };
+
+    loadYouTubeAPI();
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+    };
+  }, []);
+
+  const toggleMusic = () => {
+    if (!playerRef.current) return;
+
+    const state = playerRef.current.getPlayerState();
+
+    if (state === window.YT.PlayerState.PLAYING) {
+      playerRef.current.pauseVideo();
+      setMusicPlaying(false);
+    } else {
+      playerRef.current.seekTo(30, true);
+      playerRef.current.playVideo();
+      setMusicPlaying(true);
+    }
+  };
+
+  // Countdown
   useEffect(() => {
     const target = new Date("2026-10-31T22:00:00+05:00");
 
@@ -45,11 +129,13 @@ function Baraat() {
     };
 
     updateCountdown();
+
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
+  // Scratch card
   useEffect(() => {
     const canvas = canvasRef.current;
 
@@ -64,7 +150,7 @@ function Baraat() {
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
 
-      ctx.scale(dpr, dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       ctx.fillStyle = "#d7c2a4";
       ctx.fillRect(0, 0, rect.width, rect.height);
@@ -73,6 +159,7 @@ function Baraat() {
       ctx.font = "24px serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+
       ctx.fillText(
         "Gently scratch to reveal our special day",
         rect.width / 2,
@@ -93,20 +180,29 @@ function Baraat() {
     if (scratched) return;
 
     const canvas = canvasRef.current;
+
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const ctx = canvas.getContext("2d");
 
-    const x =
-      (event.clientX || event.touches?.[0]?.clientX) -
-      rect.left;
+    const clientX =
+      event.clientX ||
+      event.touches?.[0]?.clientX;
 
-    const y =
-      (event.clientY || event.touches?.[0]?.clientY) -
-      rect.top;
+    const clientY =
+      event.clientY ||
+      event.touches?.[0]?.clientY;
+
+    if (clientX === undefined || clientY === undefined) {
+      return;
+    }
+
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     ctx.globalCompositeOperation = "destination-out";
+
     ctx.beginPath();
     ctx.arc(x, y, 35, 0, Math.PI * 2);
     ctx.fill();
@@ -116,6 +212,7 @@ function Baraat() {
     }, 1500);
   };
 
+  // Google Calendar
   const addToCalendar = () => {
     const event = {
       title: "Baraat Ceremony",
@@ -130,9 +227,7 @@ function Baraat() {
       `https://www.google.com/calendar/render?action=TEMPLATE` +
       `&text=${encodeURIComponent(event.title)}` +
       `&dates=${event.start}/${event.end}` +
-      `&details=${encodeURIComponent(
-        "Baraat Ceremony"
-      )}` +
+      `&details=${encodeURIComponent("Baraat Ceremony")}` +
       `&location=${encodeURIComponent(event.location)}` +
       `&ctz=${encodeURIComponent(event.timezone)}` +
       `&trp=true`;
@@ -142,8 +237,34 @@ function Baraat() {
 
   return (
     <div className="baraat-page">
+
+      {/* Hidden YouTube player */}
+      <div
+        id="youtube-player"
+        style={{
+          position: "fixed",
+          width: "1px",
+          height: "1px",
+          opacity: 0,
+          pointerEvents: "none",
+          left: "-10px",
+          top: "-10px",
+        }}
+      />
+
+      {/* Music button */}
+      <button
+        className="music-button"
+        onClick={toggleMusic}
+        aria-label={musicPlaying ? "Pause music" : "Play music"}
+      >
+        {musicPlaying ? "♫ MUSIC ON" : "♫ PLAY MUSIC"}
+      </button>
+
+      {/* Hero */}
       <section className="hero">
         <div className="hero-content">
+
           <div className="bismillah">﷽</div>
 
           <p className="parents">
@@ -169,17 +290,23 @@ function Baraat() {
           </p>
 
           <div className="ornament">❦</div>
+
         </div>
       </section>
 
+      {/* Date */}
       <section className="date-section">
+
         <div className="ornament-small">✦</div>
 
-        <p className="section-label">A DATE TO REMEMBER</p>
+        <p className="section-label">
+          A DATE TO REMEMBER
+        </p>
 
         <h2>Scratch to Reveal</h2>
 
         <div className="scratch-card">
+
           <div className="revealed-date">
             <strong>31 OCTOBER 2026</strong>
             <span>SATURDAY</span>
@@ -188,25 +315,38 @@ function Baraat() {
           <canvas
             ref={canvasRef}
             onMouseMove={(event) => {
-              if (event.buttons === 1) scratch(event);
+              if (event.buttons === 1) {
+                scratch(event);
+              }
             }}
             onTouchMove={scratch}
           />
 
           {!scratched && (
             <div className="scratch-overlay">
-              <span>Gently scratch the card to reveal our special day</span>
+              <span>
+                Gently scratch the card to reveal our special day
+              </span>
             </div>
           )}
+
         </div>
 
-        <p className="save-date">SAVE THE DATE</p>
+        <p className="save-date">
+          SAVE THE DATE
+        </p>
+
       </section>
 
+      {/* Countdown */}
       <section className="countdown-section">
-        <p className="section-label">The Baraat</p>
+
+        <p className="section-label">
+          THE BARAAT
+        </p>
 
         <div className="countdown">
+
           <div className="countdown-item">
             <strong>{timeLeft.days}</strong>
             <span>DAYS</span>
@@ -226,15 +366,23 @@ function Baraat() {
             <strong>{timeLeft.seconds}</strong>
             <span>SECONDS</span>
           </div>
+
         </div>
 
         <div className="ornament">❧</div>
+
       </section>
 
+      {/* Venue */}
       <section className="venue-section">
-        <p className="section-label">THE VENUE</p>
 
-        <h2>The Manor Banquet</h2>
+        <p className="section-label">
+          THE VENUE
+        </p>
+
+        <h2>
+          The Manor Banquet
+        </h2>
 
         <p>
           Shahra-e-Faisal
@@ -252,14 +400,22 @@ function Baraat() {
         >
           ⌖ GET DIRECTIONS →
         </a>
+
       </section>
 
+      {/* Programme */}
       <section className="programme-section">
-        <p className="section-label">PROGRAMME</p>
 
-        <h2>Evening Details</h2>
+        <p className="section-label">
+          PROGRAMME
+        </p>
+
+        <h2>
+          Evening Details
+        </h2>
 
         <div className="programme-list">
+
           <div>
             <span>Arrival Of Baraat</span>
             <strong>09:00 PM</strong>
@@ -274,15 +430,25 @@ function Baraat() {
             <span>Rukhsati</span>
             <strong>11:00 PM</strong>
           </div>
+
         </div>
 
-        <div className="ornament-small">✦</div>
+        <div className="ornament-small">
+          ✦
+        </div>
+
       </section>
 
+      {/* Welcome */}
       <section className="welcome-section">
-        <p className="section-label">AWAITING TO WELCOME</p>
 
-        <h2>OUR BELOVED FAMILY & FRIENDS</h2>
+        <p className="section-label">
+          AWAITING TO WELCOME
+        </p>
+
+        <h2>
+          OUR BELOVED FAMILY & FRIENDS
+        </h2>
 
         <p>
           Your presence, prayers and blessings
@@ -290,42 +456,74 @@ function Baraat() {
           will make our celebration even more special.
         </p>
 
-        <h3>Awaiting to Welcome</h3>
+        <h3>
+          Awaiting to Welcome
+        </h3>
 
-        <h2>Mr & Mrs Advocate Ashraf Ali</h2>
+        <h2>
+          Mr & Mrs Advocate Ashraf Ali
+        </h2>
+
       </section>
 
+      {/* RSVP */}
       <section className="rsvp-section">
-        <p className="section-label">RSVP</p>
 
-        <p>FOR ANY ASSISTANCE</p>
+        <p className="section-label">
+          RSVP
+        </p>
 
-        <h3>Advocate Ashraf Ali</h3>
+        <p>
+          FOR ANY ASSISTANCE
+        </p>
+
+        <h3>
+          Advocate Ashraf Ali
+        </h3>
 
         <a href="tel:+923342595325">
           03342595325
         </a>
 
-        <div className="ornament">❦</div>
+        <div className="ornament">
+          ❦
+        </div>
+
       </section>
 
+      {/* Footer */}
       <section className="footer-section">
-        <p>WITH LOVE & BLESSINGS</p>
+        <p>
+          WITH LOVE & BLESSINGS
+        </p>
       </section>
 
+      {/* After scratch */}
       {scratched && (
         <div className="calendar-box">
+
           <button onClick={addToCalendar}>
             ADD TO CALENDAR
           </button>
 
           <div className="gift-message">
-            <strong>No Box Gifts Please</strong>
+
+            <strong>
+              No Box Gifts Please
+            </strong>
+
+            <p>
+              Your presence, love and blessings are more than enough for us.
+            </p>
+
           </div>
+
         </div>
       )}
+
     </div>
   );
 }
 
 export default Baraat;
+```
