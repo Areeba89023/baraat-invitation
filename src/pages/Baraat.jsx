@@ -6,9 +6,14 @@ const EVENT_DATE = new Date("2026-10-31T22:00:00+05:00").getTime();
 const MUSIC_VIDEO_ID = "8mYeTuzBQr4";
 const MUSIC_START = 15;
 
+const DIRECTIONS_URL =
+  "https://maps.app.goo.gl/9kn7oBToppmW7R9f6";
+
 function Baraat() {
   const [invitationOpen, setInvitationOpen] = useState(false);
   const [curtainsOpen, setCurtainsOpen] = useState(false);
+  const [openingVisible, setOpeningVisible] = useState(true);
+
   const [scratched, setScratched] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
 
@@ -28,6 +33,18 @@ function Baraat() {
   const playerReadyRef = useRef(false);
 
   /* =========================
+     PREVENT SCROLL WHILE OPENING
+  ========================= */
+
+  useEffect(() => {
+    document.body.style.overflow = openingVisible ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [openingVisible]);
+
+  /* =========================
      COUNTDOWN
   ========================= */
 
@@ -45,21 +62,12 @@ function Baraat() {
         return;
       }
 
-      const days = Math.floor(
-        difference / (1000 * 60 * 60 * 24)
-      );
+      const totalSeconds = Math.floor(difference / 1000);
 
-      const hours = Math.floor(
-        (difference / (1000 * 60 * 60)) % 24
-      );
-
-      const minutes = Math.floor(
-        (difference / (1000 * 60)) % 60
-      );
-
-      const seconds = Math.floor(
-        (difference / 1000) % 60
-      );
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
 
       setTimeLeft({
         days: String(days).padStart(2, "0"),
@@ -82,87 +90,58 @@ function Baraat() {
 
   useEffect(() => {
     const createPlayer = () => {
-      if (!window.YT || !window.YT.Player) return;
+      if (!window.YT || !window.YT.Player) {
+        return;
+      }
 
-      if (playerRef.current) return;
+      if (playerRef.current) {
+        return;
+      }
 
       playerRef.current = new window.YT.Player(
         "baraat-youtube-player",
         {
-          width: "1",
           height: "1",
-
+          width: "1",
           videoId: MUSIC_VIDEO_ID,
-
           playerVars: {
             autoplay: 0,
             controls: 0,
             rel: 0,
             modestbranding: 1,
             playsinline: 1,
-            start: MUSIC_START,
-            enablejsapi: 1,
-            origin: window.location.origin,
           },
-
           events: {
             onReady: (event) => {
               playerReadyRef.current = true;
 
-              try {
-                event.target.setVolume(85);
-                event.target.seekTo(MUSIC_START, true);
-              } catch (error) {
-                console.log("YouTube setup error:", error);
-              }
-
               if (pendingMusicRef.current) {
-                try {
-                  event.target.seekTo(MUSIC_START, true);
-                  event.target.playVideo();
-
-                  musicStartedRef.current = true;
-                  setMusicPlaying(true);
-                } catch (error) {
-                  console.log(
-                    "Music playback error:",
-                    error
-                  );
-                }
+                event.target.seekTo(MUSIC_START, true);
+                event.target.playVideo();
+                musicStartedRef.current = true;
+                setMusicPlaying(true);
               }
             },
-
             onStateChange: (event) => {
               if (
                 window.YT &&
-                event.data ===
-                  window.YT.PlayerState.PLAYING
+                event.data === window.YT.PlayerState.PLAYING
               ) {
                 setMusicPlaying(true);
               }
 
               if (
                 window.YT &&
-                event.data ===
-                  window.YT.PlayerState.PAUSED
+                event.data === window.YT.PlayerState.PAUSED
               ) {
                 setMusicPlaying(false);
               }
 
               if (
                 window.YT &&
-                event.data ===
-                  window.YT.PlayerState.ENDED
+                event.data === window.YT.PlayerState.ENDED
               ) {
-                try {
-                  event.target.seekTo(MUSIC_START, true);
-                  event.target.playVideo();
-                } catch (error) {
-                  console.log(
-                    "Music loop error:",
-                    error
-                  );
-                }
+                setMusicPlaying(false);
               }
             },
           },
@@ -181,20 +160,15 @@ function Baraat() {
 
     if (!existingScript) {
       const script = document.createElement("script");
-
-      script.src =
-        "https://www.youtube.com/iframe_api";
-
+      script.src = "https://www.youtube.com/iframe_api";
       script.async = true;
-
       document.body.appendChild(script);
     }
 
-    const previousCallback =
-      window.onYouTubeIframeAPIReady;
+    const previousCallback = window.onYouTubeIframeAPIReady;
 
     window.onYouTubeIframeAPIReady = () => {
-      if (previousCallback) {
+      if (typeof previousCallback === "function") {
         previousCallback();
       }
 
@@ -202,8 +176,9 @@ function Baraat() {
     };
 
     return () => {
-      window.onYouTubeIframeAPIReady =
-        previousCallback;
+      if (window.onYouTubeIframeAPIReady === createPlayer) {
+        window.onYouTubeIframeAPIReady = null;
+      }
     };
   }, []);
 
@@ -212,49 +187,53 @@ function Baraat() {
   ========================= */
 
   const openInvitation = () => {
+    if (invitationOpen) {
+      return;
+    }
+
     setInvitationOpen(true);
 
-    pendingMusicRef.current = true;
-
     /*
-      Music starts only after the user's tap.
-      This keeps browser autoplay restrictions
-      satisfied.
+      Keep the music request tied directly to the user's tap.
+      If YouTube is ready, it starts immediately.
+      If it is still loading, onReady will start it.
     */
+    pendingMusicRef.current = true;
 
     if (
       playerRef.current &&
       playerReadyRef.current
     ) {
       try {
-        playerRef.current.seekTo(
-          MUSIC_START,
-          true
-        );
-
+        playerRef.current.seekTo(MUSIC_START, true);
         playerRef.current.playVideo();
 
         musicStartedRef.current = true;
         setMusicPlaying(true);
       } catch (error) {
-        console.log(
-          "Unable to start music:",
-          error
-        );
+        console.warn("Music could not start automatically.", error);
       }
     }
 
     /*
-      Curtains open after the tap.
-      The opening screen remains in the DOM
-      only during the curtain animation.
+      IMPORTANT:
+      The opening screen stays mounted.
+      Only the curtain classes change.
+      This allows the CSS animation to actually run.
     */
 
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setCurtainsOpen(true);
-      }, 250);
-    });
+    setTimeout(() => {
+      setCurtainsOpen(true);
+    }, 120);
+
+    /*
+      The overlay disappears only AFTER
+      the curtain animation has finished.
+    */
+
+    setTimeout(() => {
+      setOpeningVisible(false);
+    }, 2050);
   };
 
   /* =========================
@@ -262,10 +241,7 @@ function Baraat() {
   ========================= */
 
   const toggleMusic = () => {
-    if (
-      !playerRef.current ||
-      !playerReadyRef.current
-    ) {
+    if (!playerRef.current || !playerReadyRef.current) {
       return;
     }
 
@@ -275,11 +251,7 @@ function Baraat() {
         setMusicPlaying(false);
       } else {
         if (!musicStartedRef.current) {
-          playerRef.current.seekTo(
-            MUSIC_START,
-            true
-          );
-
+          playerRef.current.seekTo(MUSIC_START, true);
           musicStartedRef.current = true;
         }
 
@@ -287,10 +259,7 @@ function Baraat() {
         setMusicPlaying(true);
       }
     } catch (error) {
-      console.log(
-        "Music button error:",
-        error
-      );
+      console.warn("Music control error.", error);
     }
   };
 
@@ -299,41 +268,33 @@ function Baraat() {
   ========================= */
 
   useEffect(() => {
-    if (!invitationOpen) return;
+    if (scratched) {
+      return;
+    }
 
     const canvas = canvasRef.current;
 
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d", {
-      willReadFrequently: true,
-    });
-
-    if (!context) return;
+    if (!canvas) {
+      return;
+    }
 
     const setupCanvas = () => {
       const rect = canvas.getBoundingClientRect();
 
-      const dpr = Math.min(
-        window.devicePixelRatio || 1,
-        2
-      );
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
 
-      context.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-      );
+      const context = canvas.getContext("2d");
 
-      /*
-        Burgundy scratch surface.
-      */
+      if (!context) {
+        return;
+      }
+
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      context.globalCompositeOperation = "source-over";
 
       const gradient = context.createLinearGradient(
         0,
@@ -342,160 +303,129 @@ function Baraat() {
         rect.height
       );
 
-      gradient.addColorStop(
-        0,
-        "#3b0a12"
-      );
-
-      gradient.addColorStop(
-        0.5,
-        "#721522"
-      );
-
-      gradient.addColorStop(
-        1,
-        "#3d0a12"
-      );
+      gradient.addColorStop(0, "#c8a65b");
+      gradient.addColorStop(0.5, "#9d7435");
+      gradient.addColorStop(1, "#d5b86e");
 
       context.fillStyle = gradient;
-      context.fillRect(
-        0,
-        0,
-        rect.width,
-        rect.height
-      );
+      context.fillRect(0, 0, rect.width, rect.height);
 
-      /*
-        Inner gold border.
-      */
-
-      context.strokeStyle = "#d2af61";
-      context.lineWidth = 1.5;
-
-      context.strokeRect(
-        10,
-        10,
-        rect.width - 20,
-        rect.height - 20
-      );
-
-      /*
-        Scratch instructions.
-      */
-
-      context.fillStyle = "#f3d995";
+      context.fillStyle = "rgba(255,255,255,0.22)";
+      context.font = "600 13px Georgia, serif";
       context.textAlign = "center";
       context.textBaseline = "middle";
-
-      context.font =
-        "600 15px Montserrat, sans-serif";
-
       context.fillText(
         "SCRATCH TO REVEAL",
         rect.width / 2,
-        rect.height / 2 - 12
-      );
-
-      context.fillStyle = "#fffaf0";
-
-      context.font =
-        "400 11px Montserrat, sans-serif";
-
-      context.fillText(
-        "Gently scratch the card",
-        rect.width / 2,
-        rect.height / 2 + 15
+        rect.height / 2
       );
     };
 
     setupCanvas();
 
-    const handleResize = () => {
-      if (!scratched) {
-        setupCanvas();
-      }
-    };
-
-    window.addEventListener(
-      "resize",
-      handleResize
-    );
+    window.addEventListener("resize", setupCanvas);
 
     return () => {
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
+      window.removeEventListener("resize", setupCanvas);
     };
-  }, [invitationOpen, scratched]);
+  }, [scratched]);
 
   const getScratchPosition = (event) => {
     const canvas = canvasRef.current;
 
-    if (!canvas) return null;
-
-    const rect =
-      canvas.getBoundingClientRect();
-
-    let clientX;
-    let clientY;
-
-    if (
-      event.touches &&
-      event.touches.length > 0
-    ) {
-      clientX =
-        event.touches[0].clientX;
-
-      clientY =
-        event.touches[0].clientY;
-    } else if (
-      event.changedTouches &&
-      event.changedTouches.length > 0
-    ) {
-      clientX =
-        event.changedTouches[0].clientX;
-
-      clientY =
-        event.changedTouches[0].clientY;
-    } else {
-      clientX = event.clientX;
-      clientY = event.clientY;
+    if (!canvas) {
+      return null;
     }
 
+    const rect = canvas.getBoundingClientRect();
+
     return {
-      x: clientX - rect.left,
-      y: clientY - rect.top,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
     };
   };
 
-  const scratch = (event) => {
-    if (scratched) return;
+  const handlePointerDown = (event) => {
+    const canvas = canvasRef.current;
+
+    if (!canvas || scratched) {
+      return;
+    }
+
+    event.preventDefault();
+
+    scratchingRef.current = true;
+
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // Some browsers may not support pointer capture.
+    }
+
+    scratchAtPosition(event);
+  };
+
+  const handlePointerMove = (event) => {
+    if (!scratchingRef.current || scratched) {
+      return;
+    }
+
+    event.preventDefault();
+
+    scratchAtPosition(event);
+  };
+
+  const handlePointerUp = (event) => {
+    scratchingRef.current = false;
 
     const canvas = canvasRef.current;
 
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
+
+    try {
+      canvas.releasePointerCapture(event.pointerId);
+    } catch {
+      // Ignore if pointer capture was not active.
+    }
+  };
+
+  const scratchAtPosition = (event) => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) {
+      return;
+    }
+
+    const position = getScratchPosition(event);
+
+    if (!position) {
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const context = canvas.getContext("2d");
 
-    if (!context) return;
-
-    const position =
-      getScratchPosition(event);
-
-    if (!position) return;
+    if (!context) {
+      return;
+    }
 
     context.save();
 
-    context.globalCompositeOperation =
-      "destination-out";
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    context.globalCompositeOperation = "destination-out";
 
     context.beginPath();
 
     context.arc(
       position.x,
       position.y,
-      30,
+      22,
       0,
       Math.PI * 2
     );
@@ -504,107 +434,60 @@ function Baraat() {
 
     context.restore();
 
-    checkScratchProgress();
-  };
-
-  const checkScratchProgress = () => {
-    const canvas = canvasRef.current;
-
-    if (!canvas) return;
-
-    const context = canvas.getContext("2d", {
-      willReadFrequently: true,
-    });
-
-    if (!context) return;
-
-    const width = canvas.width;
-    const height = canvas.height;
-
     /*
-      Check a smaller sample for performance,
-      especially on iPhone.
+      Check how much of the scratch layer has been removed.
+      Once enough is scratched, reveal the date automatically.
     */
 
-    const sampleWidth = Math.max(
-      1,
-      Math.floor(width / 4)
-    );
+    if (Math.random() > 0.92) {
+      const checkCanvas = document.createElement("canvas");
 
-    const sampleHeight = Math.max(
-      1,
-      Math.floor(height / 4)
-    );
+      const sampleWidth = 80;
+      const sampleHeight = 50;
 
-    const imageData =
-      context.getImageData(
+      checkCanvas.width = sampleWidth;
+      checkCanvas.height = sampleHeight;
+
+      const checkContext = checkCanvas.getContext("2d");
+
+      if (!checkContext) {
+        return;
+      }
+
+      checkContext.drawImage(
+        canvas,
         0,
         0,
-        width,
-        height
+        rect.width,
+        rect.height,
+        0,
+        0,
+        sampleWidth,
+        sampleHeight
       );
 
-    let transparentPixels = 0;
+      const pixels = checkContext.getImageData(
+        0,
+        0,
+        sampleWidth,
+        sampleHeight
+      ).data;
 
-    const totalPixels =
-      width * height;
+      let transparentPixels = 0;
 
-    /*
-      Sample every few pixels.
-    */
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] < 60) {
+          transparentPixels += 1;
+        }
+      }
 
-    for (
-      let i = 3;
-      i < imageData.data.length;
-      i += 16
-    ) {
-      if (imageData.data[i] < 40) {
-        transparentPixels++;
+      const percentage =
+        transparentPixels / (sampleWidth * sampleHeight);
+
+      if (percentage > 0.42) {
+        setScratched(true);
       }
     }
-
-    const estimatedPercentage =
-      (transparentPixels /
-        (totalPixels / 4)) *
-      100;
-
-    if (estimatedPercentage >= 45) {
-      setScratched(true);
-
-      context.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-    }
-  };
-
-  const handlePointerDown = (event) => {
-    if (scratched) return;
-
-    scratchingRef.current = true;
-
-    event.preventDefault();
-
-    scratch(event);
-  };
-
-  const handlePointerMove = (event) => {
-    if (
-      !scratchingRef.current ||
-      scratched
-    ) {
-      return;
-    }
-
-    event.preventDefault();
-
-    scratch(event);
-  };
-
-  const handlePointerUp = () => {
-    scratchingRef.current = false;
   };
 
   /* =========================
@@ -618,7 +501,6 @@ function Baraat() {
       "The Manor Banquet, Shahra-e-Faisal, Darwaish Colony, Karachi";
 
     const start = "20261031T210000";
-
     const end = "20261031T235900";
 
     const googleCalendarUrl =
@@ -642,7 +524,7 @@ function Baraat() {
     <div className="baraat-page">
 
       {/* =========================
-          YOUTUBE PLAYER
+          HIDDEN YOUTUBE PLAYER
       ========================= */}
 
       <div
@@ -653,90 +535,18 @@ function Baraat() {
       </div>
 
       {/* =========================
-          OPENING SCREEN
-      ========================= */}
-
-      {!curtainsOpen && (
-        <section
-          className={`opening-screen ${
-            invitationOpen
-              ? "opening-screen-opening"
-              : ""
-          }`}
-        >
-          <div className="opening-glow" />
-
-          <div className="opening-content">
-
-            <p className="opening-small">
-              THE WEDDING CELEBRATION
-            </p>
-
-            <div className="opening-ornament">
-              ❦
-            </div>
-
-            <h1 className="opening-title">
-              BARAAT
-            </h1>
-
-            <p className="opening-subtitle">
-              A Celebration of Love
-            </p>
-
-            {!invitationOpen && (
-              <button
-                type="button"
-                className="open-invitation-button"
-                onClick={openInvitation}
-              >
-                TAP TO OPEN
-              </button>
-            )}
-
-          </div>
-
-          {/* LEFT CURTAIN */}
-
-          <div
-            className={`curtain curtain-left ${
-              curtainsOpen
-                ? "curtain-left-open"
-                : ""
-            }`}
-          >
-            <div className="curtain-folds" />
-            <div className="curtain-gold-edge" />
-          </div>
-
-          {/* RIGHT CURTAIN */}
-
-          <div
-            className={`curtain curtain-right ${
-              curtainsOpen
-                ? "curtain-right-open"
-                : ""
-            }`}
-          >
-            <div className="curtain-folds" />
-            <div className="curtain-gold-edge" />
-          </div>
-        </section>
-      )}
-
-      {/* =========================
-          FULL INVITATION
+          INVITATION
       ========================= */}
 
       <main
         className={`invitation ${
-          curtainsOpen
-            ? "invitation-visible"
-            : ""
+          invitationOpen ? "invitation-visible" : ""
         }`}
       >
 
-        {/* HERO */}
+        {/* =========================
+            HERO / QURAN
+        ========================= */}
 
         <section className="hero-section">
 
@@ -767,9 +577,8 @@ function Baraat() {
             </h2>
 
             <p className="family-line">
-              Granddaughter of Mr &amp; Mrs Sheikh
-              Abdul Latif (Late) &amp; Mr &amp; Mrs.
-              Wasi Uddin Warsi (Late)
+              Granddaughter of Mr &amp; Mrs Sheikh Abdul Latif
+              (Late) &amp; Mr &amp; Mrs. Wasi Uddin Warsi (Late)
             </p>
 
           </div>
@@ -790,7 +599,7 @@ function Baraat() {
 
           </div>
 
-          {/* PLAIN PHOTOS — NO FRAME */}
+          {/* PLAIN PHOTOS */}
 
           <div className="couple-photos">
 
@@ -821,24 +630,24 @@ function Baraat() {
           <div className="hero-message">
 
             <p>
-              With immense joy and happiness,
-              we invite you to join us as we
-              celebrate the beautiful beginning
-              of a new journey.
+              With immense joy and happiness, we invite you
+              to join us as we celebrate the beautiful
+              beginning of a new journey.
             </p>
 
             <p>
-              Your presence, prayers and
-              blessings will make these precious
-              moments even more meaningful and
-              special to us.
+              Your presence, prayers and blessings will make
+              these precious moments even more meaningful
+              and special to us.
             </p>
 
           </div>
 
         </section>
 
-        {/* SCRATCH CARD */}
+        {/* =========================
+            SCRATCH CARD
+        ========================= */}
 
         <section className="scratch-section">
 
@@ -860,21 +669,11 @@ function Baraat() {
               <canvas
                 ref={canvasRef}
                 className="scratch-canvas"
-                onPointerDown={
-                  handlePointerDown
-                }
-                onPointerMove={
-                  handlePointerMove
-                }
-                onPointerUp={
-                  handlePointerUp
-                }
-                onPointerCancel={
-                  handlePointerUp
-                }
-                onPointerLeave={
-                  handlePointerUp
-                }
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onPointerLeave={handlePointerUp}
               />
             )}
 
@@ -886,9 +685,8 @@ function Baraat() {
                 </div>
 
                 <p className="gift-message">
-                  Your presence, love and
-                  blessings are more than
-                  enough for us.
+                  Your presence, love and blessings are
+                  more than enough for us.
                 </p>
 
               </div>
@@ -898,7 +696,9 @@ function Baraat() {
 
         </section>
 
-        {/* THE BARAAT */}
+        {/* =========================
+            THE BARAAT
+        ========================= */}
 
         <section className="content-section countdown-section">
 
@@ -909,30 +709,22 @@ function Baraat() {
           <div className="countdown">
 
             <div className="countdown-item">
-              <span>
-                {timeLeft.days}
-              </span>
+              <span>{timeLeft.days}</span>
               <small>DAYS</small>
             </div>
 
             <div className="countdown-item">
-              <span>
-                {timeLeft.hours}
-              </span>
+              <span>{timeLeft.hours}</span>
               <small>HOURS</small>
             </div>
 
             <div className="countdown-item">
-              <span>
-                {timeLeft.minutes}
-              </span>
+              <span>{timeLeft.minutes}</span>
               <small>MINUTES</small>
             </div>
 
             <div className="countdown-item">
-              <span>
-                {timeLeft.seconds}
-              </span>
+              <span>{timeLeft.seconds}</span>
               <small>SECONDS</small>
             </div>
 
@@ -948,7 +740,9 @@ function Baraat() {
 
         </section>
 
-        {/* VENUE */}
+        {/* =========================
+            VENUE
+        ========================= */}
 
         <section className="content-section venue-section">
 
@@ -960,20 +754,12 @@ function Baraat() {
             The Manor Banquet
           </h2>
 
-          <p>
-            Shahra-e-Faisal
-          </p>
-
-          <p>
-            Darwaish Colony
-          </p>
-
-          <p>
-            Karachi
-          </p>
+          <p>Shahra-e-Faisal</p>
+          <p>Darwaish Colony</p>
+          <p>Karachi</p>
 
           <a
-            href="https://maps.app.goo.gl/9kn7oBToppmW7R9f6"
+            href={DIRECTIONS_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="directions-button"
@@ -983,7 +769,9 @@ function Baraat() {
 
         </section>
 
-        {/* PROGRAMME */}
+        {/* =========================
+            PROGRAMME
+        ========================= */}
 
         <section className="content-section programme-section">
 
@@ -1033,7 +821,9 @@ function Baraat() {
 
         </section>
 
-        {/* WELCOME */}
+        {/* =========================
+            WELCOME
+        ========================= */}
 
         <section className="content-section welcome-section">
 
@@ -1041,20 +831,17 @@ function Baraat() {
             WELCOME
           </div>
 
-          <p className="welcome-text">
-            We would be honoured to have you
-            with us as we celebrate this beautiful
-            beginning surrounded by the people
-            we love.
+          <p>
+            We would be honoured to have you with us
+            as we celebrate this beautiful beginning
+            surrounded by the people we love.
           </p>
-
-          <div className="section-ornament">
-            ❦
-          </div>
 
         </section>
 
-        {/* RSVP */}
+        {/* =========================
+            RSVP
+        ========================= */}
 
         <section className="content-section rsvp-section">
 
@@ -1062,51 +849,177 @@ function Baraat() {
             RSVP
           </div>
 
-          <h2 className="rsvp-name">
+          <h2>
             Advocate Ashraf Ali
           </h2>
 
           <a
             href="tel:03342595325"
-            className="phone-number"
+            className="phone-link"
           >
             03342595325
           </a>
 
-          <div className="section-ornament">
+        </section>
+
+        {/* =========================
+            FOOTER
+        ========================= */}
+
+        <footer className="invitation-footer">
+
+          <div className="footer-ornament">
             ❦
           </div>
 
-          <p className="with-love">
+          <div className="footer-love">
             WITH LOVE &amp; BLESSINGS
-          </p>
+          </div>
 
-          <div className="bottom-ornament">
+          <div className="footer-ornament">
             ❦
+          </div>
+
+        </footer>
+
+      </main>
+
+      {/* =========================
+          OPENING SCREEN
+          IMPORTANT:
+          THIS STAYS MOUNTED DURING
+          THE CURTAIN ANIMATION.
+      ========================= */}
+
+      {openingVisible && (
+        <section
+          className={`opening-screen ${
+            invitationOpen ? "opening-screen-opening" : ""
+          } ${
+            !openingVisible ? "opening-screen-hidden" : ""
+          }`}
+          aria-label="Baraat invitation opening"
+        >
+
+          <div className="opening-glow" />
+
+          {/* OPENING WORDING */}
+
+          <div
+            className={`opening-content ${
+              invitationOpen
+                ? "opening-content-fade"
+                : ""
+            }`}
+          >
+
+            <p className="opening-small">
+              THE WEDDING CELEBRATION
+            </p>
+
+            <div className="opening-ornament">
+              ❦
+            </div>
+
+            <h1 className="opening-title">
+              BARAAT
+            </h1>
+
+            <p className="opening-subtitle">
+              A Celebration of Love
+            </p>
+
+            {!invitationOpen && (
+              <button
+                type="button"
+                className="open-invitation-button"
+                onClick={openInvitation}
+              >
+                TAP TO OPEN
+              </button>
+            )}
+
+          </div>
+
+          {/* GOLD CENTRE DETAIL */}
+
+          <div
+            className={`curtain-centre-detail ${
+              curtainsOpen
+                ? "curtain-centre-detail-open"
+                : ""
+            }`}
+          >
+            <span />
+          </div>
+
+          {/* LEFT CURTAIN */}
+
+          <div
+            className={`curtain curtain-left ${
+              curtainsOpen
+                ? "curtain-left-open"
+                : ""
+            }`}
+          >
+
+            <div className="curtain-folds" />
+
+            <div className="curtain-gold-edge" />
+
+            <div className="curtain-tassel">
+              ❦
+            </div>
+
+          </div>
+
+          {/* RIGHT CURTAIN */}
+
+          <div
+            className={`curtain curtain-right ${
+              curtainsOpen
+                ? "curtain-right-open"
+                : ""
+            }`}
+          >
+
+            <div className="curtain-folds" />
+
+            <div className="curtain-gold-edge" />
+
+            <div className="curtain-tassel">
+              ❦
+            </div>
+
           </div>
 
         </section>
-
-      </main>
+      )}
 
       {/* =========================
           MUSIC BUTTON
       ========================= */}
 
-      {curtainsOpen && (
-        <button
-          type="button"
-          className="music-button"
-          onClick={toggleMusic}
-          aria-label={
-            musicPlaying
-              ? "Pause music"
-              : "Play music"
-          }
-        >
-          {musicPlaying ? "Ⅱ" : "▶"}
-        </button>
-      )}
+      <button
+        type="button"
+        className={`music-button ${
+          musicPlaying ? "music-playing" : ""
+        }`}
+        onClick={toggleMusic}
+        aria-label={
+          musicPlaying
+            ? "Pause music"
+            : "Play music"
+        }
+      >
+        <span className="music-icon">
+          {musicPlaying ? "Ⅱ" : "♪"}
+        </span>
+
+        <span className="music-text">
+          {musicPlaying ? "MUSIC ON" : "MUSIC"}
+        </span>
+      </button>
 
     </div>
   );
