@@ -1,14 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Montserrat:wght@400;500;600&display=swap");
 
 :root {
-  --burgundy: #5d121b;
-  --deep-burgundy: #2b070d;
-  --red: #7d252b;
-  --gold: #c9a75c;
-  --soft-gold: #e1c77d;
-  --ivory: #f8f1e5;
-  --dark: #241013;
+  --burgundy: #68131e;
+  --deep-burgundy: #28060c;
+  --red: #852832;
+  --gold: #d2af61;
+  --soft-gold: #ead18b;
+  --ivory: #faf2e4;
+  --dark: #281316;
   --cream: #fffaf0;
+  --text-warm: #533d37;
 }
 
 * {
@@ -36,7 +37,7 @@ a {
   background:
     radial-gradient(
       circle at top,
-      rgba(201, 167, 92, 0.08),
+      rgba(210, 175, 97, 0.1),
       transparent 35%
     ),
     var(--ivory);
@@ -54,15 +55,16 @@ a {
   background:
     radial-gradient(
       circle at center,
-      rgba(201, 167, 92, 0.18),
-      transparent 42%
+      rgba(234, 209, 139, 0.2),
+      transparent 40%
     ),
     linear-gradient(
       135deg,
-      #180408,
-      #4b0d15 45%,
+      #160307,
+      #5b101a 45%,
       #21050a
     );
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,14 +86,14 @@ a {
 
 .opening-glow {
   position: absolute;
-  inset: 15%;
+  inset: 12%;
   background:
     radial-gradient(
       circle,
-      rgba(225, 199, 125, 0.2),
+      rgba(234, 209, 139, 0.22),
       transparent 62%
     );
-  filter: blur(30px);
+  filter: blur(35px);
 }
 
 .opening-frame {
@@ -99,86 +101,108 @@ a {
   width: min(88vw, 720px);
   min-height: min(82vh, 680px);
   padding: 70px 50px;
-  border: 1px solid rgba(225, 199, 125, 0.65);
+
+  border: 1px solid rgba(234, 209, 139, 0.75);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   background:
     linear-gradient(
       145deg,
-      rgba(255,255,255,0.03),
-      rgba(0,0,0,0.15)
+      rgba(255,255,255,0.04),
+      rgba(0,0,0,0.16)
     );
+
   box-shadow:
-    0 0 0 8px rgba(201, 167, 92, 0.04),
-    inset 0 0 50px rgba(0,0,0,0.2),
-    0 30px 80px rgba(0,0,0,0.35);
+    0 0 0 8px rgba(210,175,97,0.045),
+    inset 0 0 55px rgba(0,0,0,0.2),
+    0 30px 80px rgba(0,0,0,0.4);
 }
 
 .opening-content {
-  text-align: center;
   position: relative;
   z-index: 2;
+  text-align: center;
 }
 
 .opening-bismillah {
   font-family: "Amiri", serif;
   color: var(--soft-gold);
   font-size: 42px;
-  margin-bottom: 30px;
+  margin-bottom: 27px;
 }
 
 .opening-small {
-  color: #f5e8ca;
+  color: #fff1d1;
   font-family: "Montserrat", sans-serif;
-  font-size: 11px;
-  letter-spacing: 4px;
+  font-size: 9px;
+  letter-spacing: 3px;
+  font-weight: 500;
 }
 
 .opening-divider {
-  color: var(--gold);
-  font-size: 27px;
-  margin: 22px 0;
+  color: var(--soft-gold);
+  font-size: 25px;
+  margin: 20px 0;
 }
 
 .opening-content h1 {
   margin: 0;
+
   color: #fffaf0;
+
   font-family: "Cinzel", serif;
-  font-size: clamp(50px, 10vw, 92px);
+  font-size: clamp(43px, 8vw, 72px);
   font-weight: 500;
-  letter-spacing: 10px;
+  letter-spacing: 8px;
+
+  text-shadow:
+    0 2px 18px rgba(234,209,139,0.16);
 }
 
 .opening-subtitle {
-  color: var(--soft-gold);
+  color: #ead18b;
   font-family: "Great Vibes", cursive;
-  font-size: 32px;
-  margin-top: 5px;
+  font-size: 30px;
+  margin-top: 4px;
 }
 
 .open-invitation-button {
-  margin-top: 48px;
+  margin-top: 44px;
+
   padding: 16px 38px;
-  border: 1px solid var(--gold);
-  background: transparent;
+
+  border: 1px solid var(--soft-gold);
+
+  background: rgba(255,255,255,0.02);
+
   color: #fffaf0;
+
   font-family: "Montserrat", sans-serif;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 500;
   letter-spacing: 3px;
+
   cursor: pointer;
-  transition: all 0.35s ease;
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    transform 0.35s ease;
 }
 
 .open-invitation-button:hover {
-  background: var(--gold);
+  background: var(--soft-gold);
   color: var(--deep-burgundy);
+  transform: translateY(-2px);
 }
 
 .corner {
   position: absolute;
-  color: var(--gold);
-  font-size: 30px;
+  color: var(--soft-gold);
+  font-size: 29px;
 }
 
 .corner-top-left {
@@ -205,7 +229,7 @@ a {
 }
 
 /* =========================================================
-   INVITATION CONTENT
+   INVITATION
 ========================================================= */
 
 .invitation-content {
@@ -220,45 +244,65 @@ a {
 .opening-curtain {
   position: fixed;
   inset: 0;
+
   z-index: 3000;
+
   pointer-events: none;
+
   overflow: hidden;
+
+  /*
+    IMPORTANT:
+    The parent must stay transparent.
+    Only the two curtain panels have colour.
+  */
+
   background: transparent;
 }
 
 .curtain-panel {
   position: absolute;
   top: 0;
+
   width: 50.5%;
   height: 100%;
+
   overflow: hidden;
+
   background:
     linear-gradient(
       90deg,
-      #25050a 0%,
-      #68151e 18%,
-      #8a202b 37%,
-      #5d1019 55%,
-      #8b202b 72%,
+      #24050a 0%,
+      #64131d 17%,
+      #8d2530 36%,
+      #5d1019 53%,
+      #8d2530 71%,
       #35070e 100%
     );
+
   box-shadow:
-    inset 0 0 70px rgba(0,0,0,0.55),
-    inset 0 0 30px rgba(225,199,125,0.08);
+    inset 0 0 75px rgba(0,0,0,0.58),
+    inset 0 0 35px rgba(234,209,139,0.09);
+
   transition:
-    transform 1.8s cubic-bezier(0.77, 0, 0.18, 1);
+    transform 1.8s
+    cubic-bezier(0.77,0,0.18,1);
 }
 
 .curtain-left {
   left: 0;
   transform: translateX(0);
-  border-right: 1px solid rgba(225,199,125,0.5);
+
+  border-right:
+    1px solid rgba(234,209,139,0.55);
 }
 
 .curtain-right {
   right: 0;
   transform: translateX(0);
-  border-left: 1px solid rgba(225,199,125,0.5);
+
+  border-left:
+    1px solid rgba(234,209,139,0.55);
 }
 
 .curtains-open .curtain-left {
@@ -272,23 +316,24 @@ a {
 .curtain-shine {
   position: absolute;
   inset: 0;
+
   background:
     linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255,255,255,0.12) 18%,
+      rgba(255,255,255,0.13) 18%,
       transparent 28%,
-      rgba(0,0,0,0.18) 43%,
+      rgba(0,0,0,0.2) 43%,
       transparent 55%,
-      rgba(255,255,255,0.1) 68%,
+      rgba(255,255,255,0.11) 68%,
       transparent 78%
     );
-  opacity: 0.9;
 }
 
 .curtain-folds {
   position: absolute;
   inset: 0;
+
   background:
     repeating-linear-gradient(
       90deg,
@@ -297,32 +342,44 @@ a {
       transparent 10px,
       transparent 30px
     );
+
   opacity: 0.55;
 }
 
 .curtain-centre {
   position: absolute;
+
   left: 50%;
   top: 0;
+
   width: 2px;
   height: 100%;
+
   transform: translateX(-50%);
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    var(--gold),
-    transparent
-  );
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      var(--soft-gold),
+      transparent
+    );
+
   opacity: 0.7;
 }
 
 .curtain-tassel {
   position: absolute;
   top: 50%;
-  color: var(--gold);
+
+  color: var(--soft-gold);
+
   font-size: 45px;
+
   transform: translateY(-50%);
-  text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+
+  text-shadow:
+    0 3px 12px rgba(0,0,0,0.55);
 }
 
 .curtain-left .curtain-tassel {
@@ -339,24 +396,36 @@ a {
 
 .music-button {
   position: fixed;
+
   right: 22px;
   bottom: 22px;
+
   z-index: 4000;
+
   width: 48px;
   height: 48px;
+
   border-radius: 50%;
-  border: 1px solid var(--gold);
-  background: var(--burgundy);
+
+  border:
+    1px solid var(--soft-gold);
+
+  background:
+    linear-gradient(
+      145deg,
+      #721722,
+      #4e0d15
+    );
+
   color: var(--soft-gold);
+
   font-family: "Montserrat", sans-serif;
   font-size: 15px;
-  cursor: pointer;
-  box-shadow:
-    0 8px 25px rgba(0,0,0,0.2);
-}
 
-.music-button:hover {
-  background: var(--deep-burgundy);
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.24);
 }
 
 /* =========================================================
@@ -365,131 +434,220 @@ a {
 
 .hero-section {
   min-height: 100vh;
-  padding: 80px 20px 70px;
+
+  padding:
+    80px 20px 70px;
+
   text-align: center;
+
   background:
     radial-gradient(
       circle at top,
-      rgba(201,167,92,0.13),
-      transparent 35%
+      rgba(210,175,97,0.15),
+      transparent 34%
     ),
     var(--ivory);
 }
 
 .hero-bismillah {
   font-family: "Amiri", serif;
-  font-size: 45px;
+
+  font-size: 42px;
+
   color: var(--burgundy);
-  margin-bottom: 20px;
+
+  margin-bottom: 15px;
 }
 
 .quran-verse {
   font-family: "Amiri", serif;
-  font-size: clamp(30px, 5vw, 48px);
-  color: var(--burgundy);
-  line-height: 1.6;
+
+  /*
+    Reduced from the previous larger size.
+  */
+
+  font-size: clamp(25px, 4vw, 39px);
+
+  color: #6b1823;
+
+  line-height: 1.5;
 }
 
 .quran-translation {
-  margin-top: 8px;
-  font-family: "Cormorant Garamond", serif;
-  font-size: 21px;
+  margin-top: 5px;
+
+  font-family:
+    "Cormorant Garamond",
+    serif;
+
+  font-size: 18px;
+
   font-style: italic;
-  color: var(--dark);
+
+  color: #624b43;
 }
 
 .quran-reference {
-  margin-top: 7px;
+  margin-top: 6px;
+
   font-family: "Montserrat", sans-serif;
-  font-size: 10px;
+
+  font-size: 9px;
+
   letter-spacing: 2px;
-  color: #806b52;
+
+  color: #987b43;
 }
 
 .family-name {
-  margin-top: 50px;
+  margin-top: 45px;
+
   font-family: "Cinzel", serif;
-  font-size: 18px;
+
+  /*
+    Increased two sizes and bold.
+  */
+
+  font-size: 22px;
+
+  font-weight: 700;
+
   letter-spacing: 2px;
-  color: var(--burgundy);
+
+  color: #65131e;
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.5);
 }
 
 .grandparents {
   max-width: 750px;
-  margin: 14px auto 0;
+
+  margin:
+    12px auto 0;
+
   font-size: 17px;
+
   line-height: 1.5;
-  color: #5d4a43;
+
+  color: var(--text-warm);
 }
 
 .invite-line {
-  margin-top: 46px;
-  font-family: "Cormorant Garamond", serif;
-  font-size: 20px;
+  margin-top: 43px;
+
+  font-family:
+    "Cormorant Garamond",
+    serif;
+
+  font-size: 19px;
+
   font-style: italic;
+
+  color: #5d4640;
 }
 
 .ceremony-title {
-  margin-top: 12px;
+  margin-top: 10px;
+
   font-family: "Cinzel", serif;
-  font-size: clamp(28px, 5vw, 48px);
+
+  font-size:
+    clamp(27px, 5vw, 45px);
+
   font-weight: 600;
+
   letter-spacing: 4px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .beloved-line {
-  margin-top: 8px;
+  margin-top: 7px;
+
   font-family: "Great Vibes", cursive;
-  color: var(--burgundy);
-  font-size: 32px;
+
+  color: #721722;
+
+  font-size: 31px;
 }
 
 /* =========================================================
-   COUPLE IMAGES
+   PHOTOS
 ========================================================= */
 
 .couple-images {
   max-width: 850px;
-  margin: 42px auto 0;
+
+  margin:
+    42px auto 0;
+
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
   gap: 28px;
 }
 
-.couple-image-wrapper {
-  position: relative;
-  padding: 8px;
-  border: 1px solid var(--gold);
-  background: rgba(255,255,255,0.3);
-}
+/*
+  IMPORTANT:
+  There is NO frame around the photos.
+*/
 
 .couple-image {
   width: 100%;
+
   display: block;
+
   aspect-ratio: 1 / 1;
+
   object-fit: cover;
+
+  border: none;
+
+  outline: none;
+
+  box-shadow: none;
+
+  background: transparent;
 }
+
+/* =========================================================
+   MESSAGE
+========================================================= */
 
 .love-heading {
   margin-top: 48px;
+
   font-family: "Cinzel", serif;
-  font-size: clamp(20px, 4vw, 32px);
+
+  font-size:
+    clamp(20px, 4vw, 31px);
+
   letter-spacing: 3px;
+
   line-height: 1.6;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .hero-message {
   max-width: 720px;
-  margin: 25px auto 0;
+
+  margin:
+    25px auto 0;
+
   font-size: 20px;
+
   line-height: 1.6;
-  color: #594743;
+
+  color: var(--text-warm);
 }
 
 .hero-message p {
-  margin: 0 0 12px;
+  margin:
+    0 0 12px;
 }
 
 /* =========================================================
@@ -502,64 +660,105 @@ a {
 
 .scratch-card {
   position: relative;
+
   width: min(90vw, 560px);
+
   height: 190px;
-  margin: 0 auto;
-  border: 1px solid var(--gold);
+
+  margin:
+    0 auto;
+
+  overflow: hidden;
+
+  border:
+    1px solid var(--gold);
+
   background:
     linear-gradient(
       145deg,
       #fffdf8,
       #f3e8d4
     );
-  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px
+    rgba(93,18,27,0.08);
+}
+
+.scratch-card.scratch-complete {
+  border-color: var(--gold);
 }
 
 .scratch-canvas {
   position: absolute;
+
   inset: 0;
+
+  display: block;
+
   width: 100%;
   height: 100%;
+
   cursor: crosshair;
+
   touch-action: none;
+
+  user-select: none;
+
+  -webkit-user-select: none;
+
+  -webkit-touch-callout: none;
 }
 
 .revealed-date {
   position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.8s ease;
-}
 
-.revealed-date.revealed {
+  inset: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
   opacity: 1;
 }
 
 .date-number {
   font-family: "Cinzel", serif;
-  font-size: clamp(24px, 5vw, 40px);
+
+  font-size:
+    clamp(24px, 5vw, 40px);
+
   letter-spacing: 4px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .date-day {
   margin-top: 8px;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 13px;
+
   letter-spacing: 5px;
-  color: var(--gold);
+
+  color: #a47e35;
 }
 
 .scratch-hint {
   margin-top: 13px;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 10px;
+
   letter-spacing: 1.5px;
-  color: #76665d;
+
+  color: #806b61;
 }
 
 /* =========================================================
@@ -568,26 +767,51 @@ a {
 
 .date-gift-message {
   max-width: 620px;
-  margin: 30px auto 0;
-  padding: 24px 25px;
-  border: 1px solid var(--gold);
-  background: rgba(255, 250, 240, 0.75);
+
+  margin:
+    30px auto 0;
+
+  padding:
+    24px 25px;
+
+  border:
+    1px solid var(--gold);
+
+  background:
+    rgba(255,250,240,0.82);
+
   text-align: center;
+
+  box-shadow:
+    0 8px 25px
+    rgba(93,18,27,0.05);
 }
 
 .date-gift-message .gift-title {
   font-family: "Cinzel", serif;
+
   font-size: 16px;
+
+  font-weight: 600;
+
   letter-spacing: 3px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .date-gift-message p {
-  margin: 10px auto 0;
-  font-family: "Cormorant Garamond", serif;
+  margin:
+    10px auto 0;
+
+  font-family:
+    "Cormorant Garamond",
+    serif;
+
   font-size: 18px;
+
   line-height: 1.5;
-  color: var(--dark);
+
+  color: #38231f;
 }
 
 /* =========================================================
@@ -595,52 +819,83 @@ a {
 ========================================================= */
 
 .countdown-section {
-  padding: 80px 20px;
+  padding:
+    80px 20px;
+
   text-align: center;
+
   background:
     linear-gradient(
       180deg,
       #fffaf0,
       #f5e8d4
     );
-  border-top: 1px solid rgba(201,167,92,0.35);
+
+  /*
+    No unwanted gold dividing line.
+  */
+
+  border-top: none;
 }
 
 .section-heading {
   font-family: "Cinzel", serif;
+
   font-size: 28px;
+
   letter-spacing: 5px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .countdown {
   max-width: 850px;
-  margin: 40px auto 0;
+
+  margin:
+    40px auto 0;
+
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
   gap: 18px;
 }
 
 .countdown-box {
-  padding: 28px 10px;
-  border: 1px solid rgba(201,167,92,0.7);
-  background: rgba(255,255,255,0.45);
+  padding:
+    28px 10px;
+
+  border:
+    1px solid
+    rgba(210,175,97,0.7);
+
+  background:
+    rgba(255,255,255,0.5);
 }
 
 .countdown-box span {
   display: block;
+
   font-family: "Bodoni Moda", serif;
+
   font-size: 42px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .countdown-box small {
   display: block;
+
   margin-top: 6px;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 9px;
+
   letter-spacing: 2px;
-  color: #77665b;
+
+  color: #806b61;
 }
 
 .after-countdown {
@@ -650,22 +905,39 @@ a {
 .calendar-button,
 .directions-button {
   display: inline-block;
-  padding: 14px 28px;
-  border: 1px solid var(--gold);
-  background: var(--burgundy);
+
+  padding:
+    14px 28px;
+
+  border:
+    1px solid var(--gold);
+
+  background:
+    #68131e;
+
   color: #fffaf0;
+
   text-decoration: none;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 10px;
+
   letter-spacing: 2px;
+
   cursor: pointer;
-  transition: all 0.3s ease;
+
+  transition:
+    all 0.3s ease;
 }
 
 .calendar-button:hover,
 .directions-button:hover {
-  background: var(--deep-burgundy);
-  transform: translateY(-2px);
+  background:
+    #35070e;
+
+  transform:
+    translateY(-2px);
 }
 
 /* =========================================================
@@ -673,30 +945,48 @@ a {
 ========================================================= */
 
 .venue-section {
-  padding: 80px 20px;
+  padding:
+    80px 20px;
+
   text-align: center;
-  background: var(--ivory);
+
+  background:
+    var(--ivory);
 }
 
 .venue-card {
   max-width: 650px;
-  margin: 35px auto 0;
-  padding: 45px 25px;
-  border: 1px solid var(--gold);
-  background: rgba(255,255,255,0.35);
+
+  margin:
+    35px auto 0;
+
+  padding:
+    45px 25px;
+
+  border:
+    1px solid var(--gold);
+
+  background:
+    rgba(255,255,255,0.38);
 }
 
 .venue-name {
   font-family: "Cinzel", serif;
+
   font-size: 30px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .venue-address {
-  margin: 18px 0 30px;
+  margin:
+    18px 0 30px;
+
   font-size: 21px;
+
   line-height: 1.5;
-  color: #5e4b44;
+
+  color: var(--text-warm);
 }
 
 /* =========================================================
@@ -704,38 +994,62 @@ a {
 ========================================================= */
 
 .programme-section {
-  padding: 80px 20px;
+  padding:
+    80px 20px;
+
   text-align: center;
-  background: #fffaf0;
+
+  background:
+    #fffaf0;
 }
 
 .programme-list {
   max-width: 750px;
-  margin: 35px auto 0;
-  border-top: 1px solid rgba(201,167,92,0.5);
+
+  margin:
+    35px auto 0;
+
+  border-top:
+    1px solid
+    rgba(210,175,97,0.5);
 }
 
 .programme-item {
   display: grid;
-  grid-template-columns: 180px 1fr;
+
+  grid-template-columns:
+    180px 1fr;
+
   gap: 20px;
-  padding: 22px 10px;
-  border-bottom: 1px solid rgba(201,167,92,0.5);
+
+  padding:
+    22px 10px;
+
+  border-bottom:
+    1px solid
+    rgba(210,175,97,0.5);
+
   align-items: center;
 }
 
 .programme-time {
   font-family: "Montserrat", sans-serif;
+
   font-size: 12px;
+
   letter-spacing: 2px;
-  color: var(--gold);
+
+  color: #a47e35;
 }
 
 .programme-event {
   text-align: left;
+
   font-family: "Cinzel", serif;
+
   font-size: 20px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 /* =========================================================
@@ -743,12 +1057,15 @@ a {
 ========================================================= */
 
 .welcome-section {
-  padding: 85px 20px;
+  padding:
+    85px 20px;
+
   text-align: center;
+
   background:
     radial-gradient(
       circle at center,
-      rgba(201,167,92,0.1),
+      rgba(210,175,97,0.11),
       transparent 55%
     ),
     var(--ivory);
@@ -756,15 +1073,22 @@ a {
 
 .welcome-section p {
   max-width: 680px;
-  margin: 30px auto 0;
+
+  margin:
+    30px auto 0;
+
   font-size: 22px;
+
   line-height: 1.6;
-  color: #594743;
+
+  color: var(--text-warm);
 }
 
 .welcome-ornament {
   margin-top: 25px;
-  color: var(--gold);
+
+  color: #b18a40;
+
   font-size: 35px;
 }
 
@@ -773,31 +1097,49 @@ a {
 ========================================================= */
 
 .rsvp-section {
-  padding: 80px 20px;
+  padding:
+    80px 20px;
+
   text-align: center;
-  background: #fffaf0;
+
+  background:
+    #fffaf0;
 }
 
 .rsvp-card {
   max-width: 500px;
-  margin: 35px auto 0;
-  padding: 38px 25px;
-  border: 1px solid var(--gold);
+
+  margin:
+    35px auto 0;
+
+  padding:
+    38px 25px;
+
+  border:
+    1px solid var(--gold);
 }
 
 .rsvp-name {
   font-family: "Cinzel", serif;
+
   font-size: 24px;
-  color: var(--burgundy);
+
+  color: #68131e;
 }
 
 .rsvp-phone {
   display: inline-block;
+
   margin-top: 14px;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 15px;
+
   letter-spacing: 1px;
-  color: var(--burgundy);
+
+  color: #68131e;
+
   text-decoration: none;
 }
 
@@ -810,10 +1152,16 @@ a {
 ========================================================= */
 
 .footer {
-  padding: 55px 20px;
+  padding:
+    55px 20px;
+
   text-align: center;
-  background: var(--deep-burgundy);
-  color: var(--soft-gold);
+
+  background:
+    #28060c;
+
+  color:
+    var(--soft-gold);
 }
 
 .footer-ornament {
@@ -821,9 +1169,13 @@ a {
 }
 
 .footer-text {
-  margin: 14px 0;
+  margin:
+    14px 0;
+
   font-family: "Montserrat", sans-serif;
+
   font-size: 10px;
+
   letter-spacing: 4px;
 }
 
@@ -844,13 +1196,13 @@ a {
   }
 
   .opening-small {
-    font-size: 9px;
-    letter-spacing: 3px;
+    font-size: 8px;
+    letter-spacing: 2.5px;
   }
 
   .opening-content h1 {
-    font-size: 48px;
-    letter-spacing: 6px;
+    font-size: 43px;
+    letter-spacing: 5px;
   }
 
   .opening-subtitle {
@@ -859,11 +1211,13 @@ a {
 
   .open-invitation-button {
     margin-top: 38px;
-    padding: 14px 25px;
+    padding:
+      14px 25px;
   }
 
   .hero-section {
-    padding: 60px 16px 55px;
+    padding:
+      60px 16px 55px;
   }
 
   .hero-bismillah {
@@ -871,16 +1225,25 @@ a {
   }
 
   .quran-verse {
-    font-size: 30px;
+    font-size: 26px;
   }
 
   .quran-translation {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .family-name {
     margin-top: 35px;
-    font-size: 15px;
+
+    /*
+      Still larger and bold on mobile.
+    */
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.2px;
   }
 
   .grandparents {
@@ -902,9 +1265,17 @@ a {
   }
 
   .couple-images {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
+
     gap: 12px;
+
     margin-top: 30px;
+  }
+
+  .couple-image {
+    border: none;
+    box-shadow: none;
   }
 
   .love-heading {
@@ -933,7 +1304,8 @@ a {
 
   .date-gift-message {
     margin-top: 25px;
-    padding: 20px 16px;
+    padding:
+      20px 16px;
   }
 
   .date-gift-message .gift-title {
@@ -950,7 +1322,8 @@ a {
   .programme-section,
   .welcome-section,
   .rsvp-section {
-    padding: 60px 16px;
+    padding:
+      60px 16px;
   }
 
   .section-heading {
@@ -959,13 +1332,17 @@ a {
   }
 
   .countdown {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, 1fr);
+
     gap: 12px;
+
     margin-top: 30px;
   }
 
   .countdown-box {
-    padding: 22px 8px;
+    padding:
+      22px 8px;
   }
 
   .countdown-box span {
@@ -1006,7 +1383,7 @@ a {
 @media (max-width: 420px) {
 
   .opening-content h1 {
-    font-size: 40px;
+    font-size: 38px;
   }
 
   .opening-small {
