@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@400;500;600&family=Parisienne&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Montserrat:wght@400;500;600&display=swap");
 
 :root {
   --ivory: #fbf6ee;
@@ -37,9 +37,9 @@ a {
   font-family: inherit;
 }
 
-/* =========================================================
-   YOUTUBE PLAYER
-   ========================================================= */
+/* =========================================
+   YOUTUBE
+========================================= */
 
 .youtube-player {
   position: fixed;
@@ -51,172 +51,198 @@ a {
   top: -10px;
 }
 
-/* =========================================================
+/* =========================================
    OPENING SCREEN
-   ========================================================= */
+========================================= */
 
 .opening-screen {
   position: fixed;
   inset: 0;
   z-index: 5000;
-
   min-height: 100svh;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
-
   background:
     radial-gradient(
       circle at center,
-      rgba(148, 50, 58, 0.35),
-      transparent 55%
+      rgba(216, 189, 122, 0.2),
+      transparent 38%
     ),
     linear-gradient(
       135deg,
-      var(--burgundy-deep),
-      var(--burgundy),
-      var(--burgundy-dark)
+      #27070c 0%,
+      #691c24 46%,
+      #3b0d13 100%
     );
-
   color: var(--cream);
-
   text-align: center;
 }
 
 .opening-screen::before {
   content: "";
   position: absolute;
-  inset: 20px;
-
-  border: 1px solid rgba(216, 189, 122, 0.65);
-
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 20%,
+      rgba(0, 0, 0, 0.35) 100%
+    );
   pointer-events: none;
 }
 
-.opening-screen::after {
-  content: "";
+.opening-glow {
   position: absolute;
-  inset: 28px;
+  width: 55vw;
+  height: 55vw;
+  max-width: 650px;
+  max-height: 650px;
+  border-radius: 50%;
+  background: rgba(216, 189, 122, 0.08);
+  filter: blur(60px);
+}
 
-  border: 1px solid rgba(216, 189, 122, 0.2);
-
+.opening-border {
+  position: absolute;
   pointer-events: none;
+}
+
+.opening-border-one {
+  inset: 18px;
+  border: 1px solid rgba(216, 189, 122, 0.7);
+}
+
+.opening-border-two {
+  inset: 26px;
+  border: 1px solid rgba(216, 189, 122, 0.18);
 }
 
 .opening-content {
   position: relative;
-  z-index: 2;
-
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-
   padding: 30px;
+}
+
+.opening-bismillah {
+  margin-bottom: 24px;
+  font-family: "Amiri", serif;
+  font-size: 31px;
+  color: var(--gold-light);
+  direction: rtl;
 }
 
 .opening-small {
   margin: 0;
-
   font-family: "Montserrat", sans-serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 5px;
-
   color: var(--gold-light);
 }
 
 .opening-symbol {
-  margin: 25px 0 12px;
-
+  margin: 21px 0 9px;
   color: var(--gold-light);
-
   font-size: 30px;
 }
 
 .opening-title {
   margin: 0;
-
-  font-family: "Cormorant Garamond", serif;
-  font-size: clamp(62px, 14vw, 110px);
+  font-family: "Cinzel", serif;
+  font-size: clamp(58px, 14vw, 105px);
   font-weight: 500;
   letter-spacing: 10px;
   line-height: 0.9;
-
   color: var(--cream);
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .opening-subtitle {
-  margin: 18px 0 45px;
-
-  font-family: "Parisienne", cursive;
-  font-size: clamp(24px, 5vw, 36px);
-
+  margin: 18px 0 42px;
+  font-family: "Great Vibes", cursive;
+  font-size: clamp(26px, 5vw, 36px);
   color: var(--gold-light);
 }
 
 .tap-open-button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   border: 1px solid var(--gold-light);
-
-  background: transparent;
+  background: rgba(61, 16, 21, 0.35);
   color: var(--cream);
-
-  padding: 15px 30px;
-
+  padding: 14px 27px;
   font-family: "Montserrat", sans-serif;
   font-size: 10px;
   font-weight: 600;
-
   letter-spacing: 3px;
-
   cursor: pointer;
-
+  box-shadow:
+    0 0 25px rgba(216, 189, 122, 0.08),
+    inset 0 0 20px rgba(216, 189, 122, 0.04);
   transition:
     background 0.3s ease,
     color 0.3s ease,
-    transform 0.3s ease;
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.tap-open-button span {
+  color: var(--gold-light);
+  font-size: 9px;
 }
 
 .tap-open-button:hover {
   background: var(--gold-light);
   color: var(--burgundy-deep);
-
   transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(216, 189, 122, 0.2);
 }
 
-.opening-decoration {
+.tap-open-button:hover span {
+  color: var(--burgundy-deep);
+}
+
+.opening-corner {
   position: absolute;
-
+  z-index: 3;
   color: var(--gold-light);
-
-  font-size: 22px;
+  font-size: 25px;
   opacity: 0.8;
 }
 
-.top-decoration {
-  top: 55px;
-  left: 50%;
-
-  transform: translateX(-50%);
+.opening-corner-top-left {
+  top: 43px;
+  left: 43px;
 }
 
-.bottom-decoration {
-  bottom: 55px;
-  left: 50%;
-
-  transform: translateX(-50%);
+.opening-corner-top-right {
+  top: 43px;
+  right: 43px;
 }
 
-/* =========================================================
-   MAIN PAGE
-   ========================================================= */
+.opening-corner-bottom-left {
+  bottom: 43px;
+  left: 43px;
+}
+
+.opening-corner-bottom-right {
+  bottom: 43px;
+  right: 43px;
+}
+
+/* =========================================
+   PAGE
+========================================= */
 
 .baraat-page {
   min-height: 100vh;
   overflow-x: hidden;
-
   background: var(--ivory);
 }
 
@@ -234,61 +260,161 @@ a {
   }
 }
 
-/* =========================================================
-   CURTAINS
-   ========================================================= */
+/* =========================================
+   LUXURY TWO-SIDED CURTAIN
+========================================= */
 
 .opening-curtain {
   position: fixed;
   inset: 0;
-
   z-index: 2000;
-
   pointer-events: none;
-
   overflow: hidden;
+  background: #2c080d;
 }
 
 .curtain-panel {
   position: absolute;
   top: 0;
   bottom: 0;
-
-  width: 50%;
+  width: 51%;
+  overflow: hidden;
 
   background:
     linear-gradient(
       90deg,
-      rgba(55, 10, 15, 0.9),
-      transparent 12%,
-      rgba(61, 16, 21, 0.8) 30%,
-      rgba(125, 37, 43, 0.95) 50%,
-      rgba(61, 16, 21, 0.8) 70%,
-      transparent 90%
-    ),
-    var(--burgundy);
+      #2b080d 0%,
+      #58151d 10%,
+      #862a33 23%,
+      #5a171f 37%,
+      #8d2d36 49%,
+      #54131a 64%,
+      #79232c 78%,
+      #31090e 100%
+    );
 
   box-shadow:
-    inset 0 0 80px rgba(30, 0, 0, 0.45),
-    0 0 50px rgba(30, 0, 0, 0.3);
+    inset 0 0 120px rgba(25, 0, 0, 0.6),
+    0 0 50px rgba(25, 0, 0, 0.5);
 
   transition:
-    transform 1.8s cubic-bezier(0.77, 0, 0.18, 1);
+    transform 1.9s cubic-bezier(0.77, 0, 0.18, 1);
 }
 
 .curtain-left {
   left: 0;
-  transform: translateX(-100%);
+  transform: translateX(0);
+  border-right: 1px solid rgba(216, 189, 122, 0.8);
 }
 
 .curtain-right {
   right: 0;
+  transform: translateX(0);
+  border-left: 1px solid rgba(216, 189, 122, 0.8);
+}
+
+.curtain-folds {
+  position: absolute;
+  inset: 0;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 9px,
+      rgba(0, 0, 0, 0.18) 22px,
+      rgba(255, 255, 255, 0.02) 37px,
+      rgba(0, 0, 0, 0.14) 52px
+    );
+
+  opacity: 0.85;
+}
+
+.curtain-highlight {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(216, 189, 122, 0.13),
+      transparent 48%
+    );
+
+  pointer-events: none;
+}
+
+.curtain-gold-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      var(--gold-light) 15%,
+      var(--gold) 50%,
+      var(--gold-light) 85%,
+      transparent
+    );
+
+  box-shadow: 0 0 15px rgba(216, 189, 122, 0.4);
+}
+
+.curtain-left .curtain-gold-edge {
+  right: 0;
+}
+
+.curtain-right .curtain-gold-edge {
+  left: 0;
+}
+
+.curtain-tassel {
+  position: absolute;
+  top: 50%;
+  width: 58px;
+  height: 58px;
+  margin-top: -29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--gold-light);
+  border-radius: 50%;
+
+  color: var(--gold-light);
+  font-size: 21px;
+
+  background: rgba(61, 16, 21, 0.8);
+
+  box-shadow:
+    0 0 20px rgba(216, 189, 122, 0.18),
+    inset 0 0 15px rgba(216, 189, 122, 0.08);
+}
+
+.curtain-left .curtain-tassel {
+  right: 28px;
+}
+
+.curtain-right .curtain-tassel {
+  left: 28px;
+}
+
+.curtains-open .curtain-left {
+  transform: translateX(-100%);
+}
+
+.curtains-open .curtain-right {
   transform: translateX(100%);
 }
 
 .curtain-centre-text {
   position: absolute;
   inset: 0;
+  z-index: 5;
 
   display: flex;
   flex-direction: column;
@@ -297,52 +423,50 @@ a {
 
   color: var(--gold-light);
 
-  opacity: 0;
+  transition:
+    opacity 0.55s ease,
+    transform 0.7s ease;
+}
 
-  transition: opacity 0.7s ease;
+.curtains-open .curtain-centre-text {
+  opacity: 0;
+  transform: scale(1.08);
 }
 
 .curtain-small {
   font-family: "Montserrat", sans-serif;
-
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 4px;
 }
 
+.curtain-symbol {
+  margin: 18px 0 5px;
+  font-size: 28px;
+}
+
 .curtain-title {
-  margin-top: 12px;
-
-  font-size: 70px;
+  font-family: "Cinzel", serif;
+  font-size: clamp(55px, 13vw, 95px);
+  font-weight: 500;
   letter-spacing: 10px;
+  line-height: 0.9;
 }
 
-.curtain-line {
-  width: 80px;
-  height: 1px;
-
-  margin-top: 15px;
-
-  background: var(--gold-light);
+.curtain-subtitle {
+  margin-top: 18px;
+  font-family: "Great Vibes", cursive;
+  font-size: 29px;
+  color: var(--gold-light);
 }
 
-.curtain-opened .curtain-left {
-  transform: translateX(-100%);
-}
-
-.curtain-opened .curtain-right {
-  transform: translateX(100%);
-}
-
-/* =========================================================
-   MUSIC BUTTON
-   ========================================================= */
+/* =========================================
+   MUSIC
+========================================= */
 
 .music-button {
   position: fixed;
-
   right: 20px;
   bottom: 20px;
-
   z-index: 3000;
 
   width: 52px;
@@ -362,8 +486,7 @@ a {
 
   cursor: pointer;
 
-  box-shadow:
-    0 10px 25px rgba(61, 16, 21, 0.25);
+  box-shadow: 0 10px 25px rgba(61, 16, 21, 0.25);
 
   transition:
     transform 0.3s ease,
@@ -378,9 +501,9 @@ a {
   background: var(--burgundy-dark);
 }
 
-/* =========================================================
+/* =========================================
    HERO
-   ========================================================= */
+========================================= */
 
 .hero-section {
   padding: 55px 20px 65px;
@@ -396,27 +519,86 @@ a {
 
 .hero-border {
   max-width: 920px;
-
   margin: 0 auto;
-
   padding: 12px;
-
   border: 1px solid var(--gold);
 }
 
 .hero-inner {
-  padding: 55px 35px 50px;
+  padding: 48px 35px 50px;
 
   border: 1px solid rgba(184, 148, 82, 0.45);
 
   text-align: center;
 }
 
+/* =========================================
+   BASMALA + QURAN
+========================================= */
+
+.bismillah {
+  margin-bottom: 13px;
+
+  font-family: "Amiri", serif;
+  font-size: 38px;
+  line-height: 1.2;
+
+  color: var(--burgundy);
+
+  direction: rtl;
+}
+
+.quran-verse {
+  margin: 0 auto 10px;
+  max-width: 680px;
+}
+
+.arabic-verse {
+  font-family: "Amiri", serif;
+  font-size: clamp(27px, 5vw, 38px);
+  line-height: 1.6;
+  color: var(--burgundy);
+  direction: rtl;
+}
+
+.verse-translation {
+  margin-top: 3px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-size: 20px;
+
+  color: var(--brown);
+}
+
+.verse-reference {
+  margin-top: 7px;
+
+  font-family: "Montserrat", sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+
+  color: var(--gold-dark);
+}
+
+.ornament {
+  margin: 12px 0 14px;
+  color: var(--gold);
+  font-size: 24px;
+}
+
+/* =========================================
+   INVITATION WORDING
+========================================= */
+
 .family-name {
   color: var(--burgundy);
 
+  font-family: "Bodoni Moda", serif;
   font-size: clamp(24px, 4vw, 36px);
   font-weight: 600;
+
+  letter-spacing: 0.3px;
 }
 
 .family-line {
@@ -424,6 +606,7 @@ a {
 
   max-width: 700px;
 
+  font-family: "Cormorant Garamond", serif;
   font-size: 18px;
   line-height: 1.5;
 
@@ -434,7 +617,6 @@ a {
   margin-top: 25px;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 11px;
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -445,9 +627,9 @@ a {
 .baraat-title {
   margin: 18px 0 10px;
 
+  font-family: "Cinzel", serif;
   font-size: clamp(36px, 7vw, 58px);
   font-weight: 600;
-
   letter-spacing: 5px;
 
   color: var(--burgundy);
@@ -468,31 +650,27 @@ a {
 .title-divider span {
   height: 1px;
   flex: 1;
-
   background: var(--gold);
 }
 
 .title-divider .diamond {
   flex: none;
-
   color: var(--gold-dark);
-
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .beloved-line {
   margin-bottom: 30px;
 
-  font-family: "Parisienne", cursive;
-
-  font-size: 28px;
+  font-family: "Great Vibes", cursive;
+  font-size: 30px;
 
   color: var(--burgundy);
 }
 
-/* =========================================================
-   COUPLE PHOTOS
-   ========================================================= */
+/* =========================================
+   COUPLE IMAGES
+========================================= */
 
 .couple-visuals {
   display: flex;
@@ -501,7 +679,7 @@ a {
 
   gap: 25px;
 
-  margin: 15px auto 40px;
+  margin: 15px auto 35px;
 }
 
 .person {
@@ -519,7 +697,6 @@ a {
 
   width: min(250px, 34vw);
   height: auto;
-
   max-height: 360px;
 
   object-fit: contain;
@@ -527,27 +704,76 @@ a {
   border: none;
   outline: none;
   box-shadow: none;
-
   background: transparent;
 }
 
 .couple-ampersand {
   flex-shrink: 0;
 
-  font-family: "Parisienne", cursive;
+  font-family: "Great Vibes", cursive;
   font-size: 48px;
 
   color: var(--gold-dark);
 }
 
-/* =========================================================
-   SCRATCH DATE
-   ========================================================= */
+/* =========================================
+   ADDITIONAL MESSAGE
+========================================= */
+
+.opening-message {
+  max-width: 650px;
+  margin: 10px auto 45px;
+
+  text-align: center;
+}
+
+.message-ornament {
+  margin: 12px 0;
+
+  color: var(--gold);
+  font-size: 17px;
+}
+
+.opening-message h2 {
+  margin: 12px 0 20px;
+
+  font-family: "Cinzel", serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.8;
+  letter-spacing: 2px;
+
+  color: var(--burgundy);
+}
+
+.opening-message p {
+  margin: 12px 0;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 19px;
+  line-height: 1.6;
+
+  color: var(--brown);
+}
+
+/* =========================================
+   DATE
+========================================= */
+
+.date-heading {
+  margin-bottom: 15px;
+
+  font-family: "Cinzel", serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+
+  color: var(--burgundy);
+}
 
 .date-reveal-area {
   width: 100%;
   max-width: 520px;
-
   margin: 0 auto;
 }
 
@@ -587,9 +813,10 @@ a {
 }
 
 .date-day {
+  font-family: "Bodoni Moda", serif;
+
   font-size: clamp(24px, 5vw, 34px);
   font-weight: 600;
-
   letter-spacing: 3px;
 }
 
@@ -597,7 +824,6 @@ a {
   margin-top: 7px;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 11px;
   letter-spacing: 4px;
 
@@ -606,7 +832,6 @@ a {
 
 .scratch-canvas {
   position: absolute;
-
   inset: 0;
 
   display: block;
@@ -629,11 +854,12 @@ a {
 }
 
 .revealed-date-main {
+  font-family: "Bodoni Moda", serif;
+
   color: var(--burgundy);
 
   font-size: clamp(27px, 6vw, 38px);
   font-weight: 600;
-
   letter-spacing: 3px;
 }
 
@@ -641,16 +867,26 @@ a {
   margin-top: 7px;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 11px;
   letter-spacing: 4px;
 
   color: var(--gold-dark);
 }
 
-/* =========================================================
+.scratch-hint {
+  margin-top: 13px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+
+  font-size: 17px;
+
+  color: var(--gold-dark);
+}
+
+/* =========================================
    SECTION HEADINGS
-   ========================================================= */
+========================================= */
 
 .section-heading {
   display: flex;
@@ -666,20 +902,16 @@ a {
 
 .section-heading span {
   height: 1px;
-
   flex: 1;
-
   background: var(--gold);
 }
 
 .section-heading h2 {
   margin: 0;
 
-  font-family: "Montserrat", sans-serif;
-
+  font-family: "Cinzel", serif;
   font-size: 12px;
   font-weight: 600;
-
   letter-spacing: 4px;
 
   color: var(--burgundy);
@@ -695,19 +927,20 @@ a {
   background: var(--gold-light);
 }
 
-/* =========================================================
+/* =========================================
    COUNTDOWN
-   ========================================================= */
+========================================= */
 
 .countdown-section {
   padding: 65px 20px;
 
   background: var(--cream);
+
+  text-align: center;
 }
 
 .countdown-grid {
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
 
   max-width: 800px;
@@ -733,8 +966,9 @@ a {
 .countdown-item strong {
   display: block;
 
-  font-size: clamp(35px, 6vw, 55px);
+  font-family: "Bodoni Moda", serif;
 
+  font-size: clamp(35px, 6vw, 55px);
   font-weight: 500;
 
   color: var(--burgundy);
@@ -746,11 +980,17 @@ a {
   margin-top: 5px;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 9px;
   letter-spacing: 2px;
 
   color: var(--gold-dark);
+}
+
+.countdown-ornament {
+  margin-top: 25px;
+
+  color: var(--gold);
+  font-size: 22px;
 }
 
 .after-countdown {
@@ -760,7 +1000,7 @@ a {
 
   gap: 25px;
 
-  margin-top: 35px;
+  margin-top: 25px;
 
   text-align: center;
 }
@@ -774,10 +1014,8 @@ a {
   color: var(--cream);
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 10px;
   font-weight: 600;
-
   letter-spacing: 2px;
 
   cursor: pointer;
@@ -787,22 +1025,18 @@ a {
 
 .calendar-button:hover {
   background: transparent;
-
   color: var(--burgundy);
 }
 
 .gift-message {
   max-width: 500px;
-
   padding-top: 5px;
 }
 
 .gift-title {
-  font-family: "Montserrat", sans-serif;
-
+  font-family: "Cinzel", serif;
   font-size: 11px;
   font-weight: 600;
-
   letter-spacing: 3px;
 
   color: var(--burgundy);
@@ -811,14 +1045,14 @@ a {
 .gift-message p {
   margin: 9px 0 0;
 
+  font-family: "Cormorant Garamond", serif;
   font-size: 17px;
-
   line-height: 1.5;
 }
 
-/* =========================================================
+/* =========================================
    VENUE
-   ========================================================= */
+========================================= */
 
 .venue-section {
   padding: 70px 20px;
@@ -832,13 +1066,13 @@ a {
 
 .venue-content {
   max-width: 600px;
-
   margin: 0 auto;
 }
 
 .venue-content h3 {
   margin: 0 0 15px;
 
+  font-family: "Bodoni Moda", serif;
   font-size: 38px;
   font-weight: 500;
 
@@ -848,8 +1082,8 @@ a {
 .venue-content p {
   margin: 0 0 30px;
 
+  font-family: "Cormorant Garamond", serif;
   font-size: 19px;
-
   line-height: 1.6;
 }
 
@@ -865,10 +1099,8 @@ a {
   text-decoration: none;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 10px;
   font-weight: 600;
-
   letter-spacing: 2px;
 
   transition: 0.3s ease;
@@ -876,23 +1108,32 @@ a {
 
 .directions-button:hover {
   background: var(--gold-light);
-
   color: var(--burgundy);
 }
 
-/* =========================================================
+/* =========================================
    PROGRAMME
-   ========================================================= */
+========================================= */
 
 .programme-section {
   padding: 70px 20px;
 
   background: var(--ivory);
+
+  text-align: center;
+}
+
+.programme-subtitle {
+  margin: -15px 0 30px;
+
+  font-family: "Great Vibes", cursive;
+  font-size: 28px;
+
+  color: var(--burgundy);
 }
 
 .programme-list {
   max-width: 700px;
-
   margin: 0 auto;
 
   border-top: 1px solid rgba(184, 148, 82, 0.5);
@@ -900,7 +1141,6 @@ a {
 
 .programme-row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -910,6 +1150,7 @@ a {
 
   border-bottom: 1px solid rgba(184, 148, 82, 0.5);
 
+  font-family: "Cormorant Garamond", serif;
   font-size: 19px;
 }
 
@@ -917,16 +1158,22 @@ a {
   color: var(--burgundy);
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 11px;
   letter-spacing: 1px;
 
   white-space: nowrap;
 }
 
-/* =========================================================
+.programme-ornament {
+  margin-top: 25px;
+
+  color: var(--gold);
+  font-size: 18px;
+}
+
+/* =========================================
    WELCOME
-   ========================================================= */
+========================================= */
 
 .welcome-section {
   padding: 70px 20px;
@@ -936,21 +1183,55 @@ a {
   text-align: center;
 }
 
+.welcome-script {
+  margin: 0 auto 20px;
+
+  font-family: "Great Vibes", cursive;
+  font-size: 30px;
+  line-height: 1.4;
+
+  color: var(--burgundy);
+}
+
 .welcome-section p {
   margin: 0 auto;
 
-  max-width: 600px;
+  max-width: 650px;
 
-  font-size: 23px;
-
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
   line-height: 1.7;
 
   color: var(--brown);
 }
 
-/* =========================================================
+.welcome-section p strong {
+  font-weight: 500;
+}
+
+.awaiting {
+  margin-top: 35px;
+
+  font-family: "Cinzel", serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+
+  color: var(--gold-dark);
+}
+
+.welcome-family {
+  margin-top: 10px;
+
+  font-family: "Bodoni Moda", serif;
+  font-size: 25px;
+
+  color: var(--burgundy);
+}
+
+/* =========================================
    RSVP
-   ========================================================= */
+========================================= */
 
 .rsvp-section {
   padding: 70px 20px;
@@ -960,9 +1241,20 @@ a {
   text-align: center;
 }
 
+.rsvp-assistance {
+  margin-bottom: 10px;
+
+  font-family: "Montserrat", sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+
+  color: var(--gold-dark);
+}
+
 .rsvp-name {
   margin: 0 0 10px;
 
+  font-family: "Bodoni Moda", serif;
   font-size: 26px;
 
   color: var(--burgundy);
@@ -976,14 +1268,20 @@ a {
   text-decoration: none;
 
   font-family: "Montserrat", sans-serif;
-
   font-size: 15px;
   letter-spacing: 1px;
 }
 
-/* =========================================================
+.rsvp-ornament {
+  margin-top: 25px;
+
+  color: var(--gold);
+  font-size: 24px;
+}
+
+/* =========================================
    FOOTER
-   ========================================================= */
+========================================= */
 
 .footer-section {
   padding: 35px 20px 50px;
@@ -1001,49 +1299,114 @@ a {
   height: 1px;
 
   margin: 0 auto;
+
   background: var(--gold-dark);
 }
 
+.footer-symbol {
+  margin-top: 15px;
+
+  color: var(--gold-light);
+  font-size: 16px;
+}
+
 .footer-section p {
-  margin: 18px 0;
+  margin: 10px 0 15px;
 
-  font-family: "Montserrat", sans-serif;
-
-  font-size: 9px;
+  font-family: "Cinzel", serif;
+  font-size: 10px;
   letter-spacing: 4px;
 }
 
-/* =========================================================
+.footer-message {
+  margin-bottom: 18px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  line-height: 1.5;
+
+  color: var(--cream);
+}
+
+/* =========================================
    MOBILE
-   ========================================================= */
+========================================= */
 
 @media (max-width: 700px) {
-  .opening-screen::before {
-    inset: 14px;
+  .opening-screen {
+    padding: 10px;
   }
 
-  .opening-screen::after {
-    inset: 21px;
+  .opening-border-one {
+    inset: 13px;
+  }
+
+  .opening-border-two {
+    inset: 19px;
+  }
+
+  .opening-bismillah {
+    font-size: 27px;
+    margin-bottom: 20px;
   }
 
   .opening-small {
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 3px;
   }
 
-  .opening-symbol {
-    margin-top: 22px;
-  }
-
   .opening-title {
-    font-size: 58px;
+    font-size: 56px;
     letter-spacing: 7px;
   }
 
   .opening-subtitle {
-    margin-bottom: 38px;
-
+    margin-bottom: 36px;
     font-size: 27px;
+  }
+
+  .opening-corner-top-left {
+    top: 30px;
+    left: 30px;
+  }
+
+  .opening-corner-top-right {
+    top: 30px;
+    right: 30px;
+  }
+
+  .opening-corner-bottom-left {
+    bottom: 30px;
+    left: 30px;
+  }
+
+  .opening-corner-bottom-right {
+    bottom: 30px;
+    right: 30px;
+  }
+
+  .curtain-title {
+    font-size: 57px;
+    letter-spacing: 7px;
+  }
+
+  .curtain-subtitle {
+    font-size: 24px;
+  }
+
+  .curtain-tassel {
+    width: 45px;
+    height: 45px;
+    margin-top: -22px;
+    font-size: 16px;
+  }
+
+  .curtain-left .curtain-tassel {
+    right: 18px;
+  }
+
+  .curtain-right .curtain-tassel {
+    left: 18px;
   }
 
   .hero-section {
@@ -1055,7 +1418,19 @@ a {
   }
 
   .hero-inner {
-    padding: 38px 16px 40px;
+    padding: 35px 16px 40px;
+  }
+
+  .bismillah {
+    font-size: 34px;
+  }
+
+  .arabic-verse {
+    font-size: 28px;
+  }
+
+  .verse-translation {
+    font-size: 18px;
   }
 
   .family-name {
@@ -1077,12 +1452,11 @@ a {
   }
 
   .beloved-line {
-    font-size: 24px;
+    font-size: 26px;
   }
 
   .couple-visuals {
     gap: 10px;
-
     margin-bottom: 30px;
   }
 
@@ -1094,6 +1468,19 @@ a {
 
   .couple-ampersand {
     font-size: 35px;
+  }
+
+  .opening-message {
+    margin-bottom: 35px;
+  }
+
+  .opening-message h2 {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+  }
+
+  .opening-message p {
+    font-size: 17px;
   }
 
   .scratch-wrapper {
@@ -1129,8 +1516,8 @@ a {
     font-size: 17px;
   }
 
-  .welcome-section p {
-    font-size: 20px;
+  .welcome-script {
+    font-size: 25px;
   }
 
   .venue-content h3 {
@@ -1140,7 +1527,6 @@ a {
   .music-button {
     right: 14px;
     bottom: 14px;
-
     width: 46px;
     height: 46px;
   }
@@ -1148,23 +1534,35 @@ a {
 
 @media (max-width: 420px) {
   .opening-title {
-    font-size: 49px;
+    font-size: 48px;
     letter-spacing: 5px;
   }
 
   .opening-small {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .opening-subtitle {
-    font-size: 24px;
+    font-size: 23px;
+  }
+
+  .opening-bismillah {
+    font-size: 25px;
   }
 
   .tap-open-button {
-    padding: 13px 22px;
-
+    padding: 13px 21px;
     font-size: 9px;
     letter-spacing: 2px;
+  }
+
+  .curtain-title {
+    font-size: 48px;
+    letter-spacing: 5px;
+  }
+
+  .curtain-subtitle {
+    font-size: 21px;
   }
 
   .family-name {
@@ -1183,6 +1581,14 @@ a {
     font-size: 30px;
   }
 
+  .arabic-verse {
+    font-size: 24px;
+  }
+
+  .verse-translation {
+    font-size: 17px;
+  }
+
   .date-day {
     font-size: 19px;
   }
@@ -1193,5 +1599,9 @@ a {
 
   .gift-title {
     font-size: 9px;
+  }
+
+  .welcome-family {
+    font-size: 22px;
   }
 }
