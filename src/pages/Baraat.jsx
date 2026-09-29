@@ -110,18 +110,29 @@ function Baraat() {
             rel: 0,
             modestbranding: 1,
             playsinline: 1,
+            origin: window.location.origin,
+            enablejsapi: 1,
           },
           events: {
             onReady: (event) => {
               playerReadyRef.current = true;
 
               if (pendingMusicRef.current) {
-                event.target.seekTo(MUSIC_START, true);
-                event.target.playVideo();
-                musicStartedRef.current = true;
-                setMusicPlaying(true);
+                try {
+                  event.target.seekTo(MUSIC_START, true);
+                  event.target.playVideo();
+
+                  musicStartedRef.current = true;
+                  setMusicPlaying(true);
+                } catch (error) {
+                  console.warn(
+                    "Music could not start automatically.",
+                    error
+                  );
+                }
               }
             },
+
             onStateChange: (event) => {
               if (
                 window.YT &&
@@ -160,8 +171,10 @@ function Baraat() {
 
     if (!existingScript) {
       const script = document.createElement("script");
+
       script.src = "https://www.youtube.com/iframe_api";
       script.async = true;
+
       document.body.appendChild(script);
     }
 
@@ -176,8 +189,8 @@ function Baraat() {
     };
 
     return () => {
-      if (window.onYouTubeIframeAPIReady === createPlayer) {
-        window.onYouTubeIframeAPIReady = null;
+      if (window.onYouTubeIframeAPIReady) {
+        window.onYouTubeIframeAPIReady = previousCallback;
       }
     };
   }, []);
@@ -194,10 +207,10 @@ function Baraat() {
     setInvitationOpen(true);
 
     /*
-      Keep the music request tied directly to the user's tap.
-      If YouTube is ready, it starts immediately.
-      If it is still loading, onReady will start it.
+      Keep the music request tied directly
+      to the user's tap.
     */
+
     pendingMusicRef.current = true;
 
     if (
@@ -211,15 +224,16 @@ function Baraat() {
         musicStartedRef.current = true;
         setMusicPlaying(true);
       } catch (error) {
-        console.warn("Music could not start automatically.", error);
+        console.warn(
+          "Music could not start automatically.",
+          error
+        );
       }
     }
 
     /*
-      IMPORTANT:
-      The opening screen stays mounted.
-      Only the curtain classes change.
-      This allows the CSS animation to actually run.
+      Open the curtains after the
+      invitation has been triggered.
     */
 
     setTimeout(() => {
@@ -227,7 +241,7 @@ function Baraat() {
     }, 120);
 
     /*
-      The overlay disappears only AFTER
+      Hide the opening screen only after
       the curtain animation has finished.
     */
 
@@ -281,10 +295,20 @@ function Baraat() {
     const setupCanvas = () => {
       const rect = canvas.getBoundingClientRect();
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
+      );
 
-      canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-      canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+      canvas.width = Math.max(
+        1,
+        Math.floor(rect.width * dpr)
+      );
+
+      canvas.height = Math.max(
+        1,
+        Math.floor(rect.height * dpr)
+      );
 
       const context = canvas.getContext("2d");
 
@@ -292,9 +316,17 @@ function Baraat() {
         return;
       }
 
-      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      context.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+      );
 
-      context.globalCompositeOperation = "source-over";
+      context.globalCompositeOperation =
+        "source-over";
 
       const gradient = context.createLinearGradient(
         0,
@@ -303,17 +335,39 @@ function Baraat() {
         rect.height
       );
 
-      gradient.addColorStop(0, "#c8a65b");
-      gradient.addColorStop(0.5, "#9d7435");
-      gradient.addColorStop(1, "#d5b86e");
+      gradient.addColorStop(
+        0,
+        "#c8a65b"
+      );
+
+      gradient.addColorStop(
+        0.5,
+        "#9d7435"
+      );
+
+      gradient.addColorStop(
+        1,
+        "#d5b86e"
+      );
 
       context.fillStyle = gradient;
-      context.fillRect(0, 0, rect.width, rect.height);
 
-      context.fillStyle = "rgba(255,255,255,0.22)";
-      context.font = "600 13px Georgia, serif";
+      context.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+      context.fillStyle =
+        "rgba(255,255,255,0.22)";
+
+      context.font =
+        "600 13px Georgia, serif";
+
       context.textAlign = "center";
       context.textBaseline = "middle";
+
       context.fillText(
         "SCRATCH TO REVEAL",
         rect.width / 2,
@@ -323,10 +377,16 @@ function Baraat() {
 
     setupCanvas();
 
-    window.addEventListener("resize", setupCanvas);
+    window.addEventListener(
+      "resize",
+      setupCanvas
+    );
 
     return () => {
-      window.removeEventListener("resize", setupCanvas);
+      window.removeEventListener(
+        "resize",
+        setupCanvas
+      );
     };
   }, [scratched]);
 
@@ -337,7 +397,8 @@ function Baraat() {
       return null;
     }
 
-    const rect = canvas.getBoundingClientRect();
+    const rect =
+      canvas.getBoundingClientRect();
 
     return {
       x: event.clientX - rect.left,
@@ -357,7 +418,9 @@ function Baraat() {
     scratchingRef.current = true;
 
     try {
-      canvas.setPointerCapture(event.pointerId);
+      canvas.setPointerCapture(
+        event.pointerId
+      );
     } catch {
       // Some browsers may not support pointer capture.
     }
@@ -366,7 +429,10 @@ function Baraat() {
   };
 
   const handlePointerMove = (event) => {
-    if (!scratchingRef.current || scratched) {
+    if (
+      !scratchingRef.current ||
+      scratched
+    ) {
       return;
     }
 
@@ -385,7 +451,9 @@ function Baraat() {
     }
 
     try {
-      canvas.releasePointerCapture(event.pointerId);
+      canvas.releasePointerCapture(
+        event.pointerId
+      );
     } catch {
       // Ignore if pointer capture was not active.
     }
@@ -398,17 +466,23 @@ function Baraat() {
       return;
     }
 
-    const position = getScratchPosition(event);
+    const position =
+      getScratchPosition(event);
 
     if (!position) {
       return;
     }
 
-    const rect = canvas.getBoundingClientRect();
+    const rect =
+      canvas.getBoundingClientRect();
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      2
+    );
 
-    const context = canvas.getContext("2d");
+    const context =
+      canvas.getContext("2d");
 
     if (!context) {
       return;
@@ -416,9 +490,17 @@ function Baraat() {
 
     context.save();
 
-    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.setTransform(
+      dpr,
+      0,
+      0,
+      dpr,
+      0,
+      0
+    );
 
-    context.globalCompositeOperation = "destination-out";
+    context.globalCompositeOperation =
+      "destination-out";
 
     context.beginPath();
 
@@ -435,12 +517,13 @@ function Baraat() {
     context.restore();
 
     /*
-      Check how much of the scratch layer has been removed.
-      Once enough is scratched, reveal the date automatically.
+      Check how much of the scratch layer
+      has been removed.
     */
 
     if (Math.random() > 0.92) {
-      const checkCanvas = document.createElement("canvas");
+      const checkCanvas =
+        document.createElement("canvas");
 
       const sampleWidth = 80;
       const sampleHeight = 50;
@@ -448,7 +531,8 @@ function Baraat() {
       checkCanvas.width = sampleWidth;
       checkCanvas.height = sampleHeight;
 
-      const checkContext = checkCanvas.getContext("2d");
+      const checkContext =
+        checkCanvas.getContext("2d");
 
       if (!checkContext) {
         return;
@@ -466,23 +550,29 @@ function Baraat() {
         sampleHeight
       );
 
-      const pixels = checkContext.getImageData(
-        0,
-        0,
-        sampleWidth,
-        sampleHeight
-      ).data;
+      const pixels =
+        checkContext.getImageData(
+          0,
+          0,
+          sampleWidth,
+          sampleHeight
+        ).data;
 
       let transparentPixels = 0;
 
-      for (let i = 3; i < pixels.length; i += 4) {
+      for (
+        let i = 3;
+        i < pixels.length;
+        i += 4
+      ) {
         if (pixels[i] < 60) {
           transparentPixels += 1;
         }
       }
 
       const percentage =
-        transparentPixels / (sampleWidth * sampleHeight);
+        transparentPixels /
+        (sampleWidth * sampleHeight);
 
       if (percentage > 0.42) {
         setScratched(true);
@@ -495,13 +585,17 @@ function Baraat() {
   ========================= */
 
   const addToCalendar = () => {
-    const title = "Baraat Ceremony";
+    const title =
+      "Baraat Ceremony";
 
     const location =
       "The Manor Banquet, Shahra-e-Faisal, Darwaish Colony, Karachi";
 
-    const start = "20261031T210000";
-    const end = "20261031T235900";
+    const start =
+      "20261031T210000";
+
+    const end =
+      "20261031T235900";
 
     const googleCalendarUrl =
       `https://calendar.google.com/calendar/render?action=TEMPLATE` +
@@ -510,7 +604,9 @@ function Baraat() {
       `&details=${encodeURIComponent(
         "Baraat Ceremony"
       )}` +
-      `&location=${encodeURIComponent(location)}` +
+      `&location=${encodeURIComponent(
+        location
+      )}` +
       `&ctz=Asia/Karachi`;
 
     window.open(
@@ -531,7 +627,13 @@ function Baraat() {
         className="youtube-player-hidden"
         aria-hidden="true"
       >
-        <div id="baraat-youtube-player" />
+        <div
+          id="baraat-youtube-player"
+          style={{
+            width: "1px",
+            height: "1px",
+          }}
+        />
       </div>
 
       {/* =========================
@@ -540,7 +642,9 @@ function Baraat() {
 
       <main
         className={`invitation ${
-          invitationOpen ? "invitation-visible" : ""
+          invitationOpen
+            ? "invitation-visible"
+            : ""
         }`}
       >
 
@@ -669,11 +773,21 @@ function Baraat() {
               <canvas
                 ref={canvasRef}
                 className="scratch-canvas"
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerUp}
-                onPointerLeave={handlePointerUp}
+                onPointerDown={
+                  handlePointerDown
+                }
+                onPointerMove={
+                  handlePointerMove
+                }
+                onPointerUp={
+                  handlePointerUp
+                }
+                onPointerCancel={
+                  handlePointerUp
+                }
+                onPointerLeave={
+                  handlePointerUp
+                }
               />
             )}
 
@@ -886,17 +1000,18 @@ function Baraat() {
 
       {/* =========================
           OPENING SCREEN
-          IMPORTANT:
-          THIS STAYS MOUNTED DURING
-          THE CURTAIN ANIMATION.
-      ========================= */}
+          ========================= */}
 
       {openingVisible && (
         <section
           className={`opening-screen ${
-            invitationOpen ? "opening-screen-opening" : ""
+            invitationOpen
+              ? "opening-screen-opening"
+              : ""
           } ${
-            !openingVisible ? "opening-screen-hidden" : ""
+            !openingVisible
+              ? "opening-screen-hidden"
+              : ""
           }`}
           aria-label="Baraat invitation opening"
         >
@@ -1003,7 +1118,9 @@ function Baraat() {
       <button
         type="button"
         className={`music-button ${
-          musicPlaying ? "music-playing" : ""
+          musicPlaying
+            ? "music-playing"
+            : ""
         }`}
         onClick={toggleMusic}
         aria-label={
@@ -1017,7 +1134,9 @@ function Baraat() {
         </span>
 
         <span className="music-text">
-          {musicPlaying ? "MUSIC ON" : "MUSIC"}
+          {musicPlaying
+            ? "MUSIC ON"
+            : "MUSIC"}
         </span>
       </button>
 
