@@ -1,15 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Montserrat:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,600&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap");
 
 :root {
   --burgundy: #68131e;
   --deep-burgundy: #28060c;
-  --red: #852832;
+  --rich-red: #852832;
   --gold: #d2af61;
   --soft-gold: #ead18b;
+  --bright-gold: #f3d995;
   --ivory: #faf2e4;
-  --dark: #281316;
   --cream: #fffaf0;
-  --text-warm: #533d37;
+  --dark: #281316;
+  --warm-text: #533d37;
 }
 
 * {
@@ -22,7 +23,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--ivory);
+  padding: 0;
+  background: var(--cream);
   color: var(--dark);
   font-family: "Cormorant Garamond", serif;
 }
@@ -32,15 +34,36 @@ a {
   font-family: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
 .baraat-page {
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(
       circle at top,
-      rgba(210, 175, 97, 0.1),
+      rgba(210, 175, 97, 0.08),
       transparent 35%
     ),
-    var(--ivory);
+    var(--cream);
+}
+
+/* =========================================================
+   YOUTUBE
+========================================================= */
+
+.youtube-player-container {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  left: -10px;
+  top: -10px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -100;
 }
 
 /* =========================================================
@@ -50,382 +73,265 @@ a {
 .opening-screen {
   position: fixed;
   inset: 0;
-  z-index: 5000;
+  z-index: 9999;
   overflow: hidden;
   background:
     radial-gradient(
       circle at center,
-      rgba(234, 209, 139, 0.2),
-      transparent 40%
-    ),
-    linear-gradient(
-      135deg,
-      #160307,
-      #5b101a 45%,
-      #21050a
+      #741b28 0%,
+      #4d0d17 42%,
+      #26050b 100%
     );
-
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
 }
 
-.youtube-player-wrapper {
+.opening-screen::before {
+  content: "";
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.youtube-player {
-  width: 1px;
-  height: 1px;
-}
-
-.opening-glow {
-  position: absolute;
-  inset: 12%;
+  inset: 0;
   background:
     radial-gradient(
-      circle,
-      rgba(234, 209, 139, 0.22),
-      transparent 62%
+      ellipse at center,
+      rgba(243, 217, 149, 0.22),
+      transparent 42%
     );
-  filter: blur(35px);
+  pointer-events: none;
+  z-index: 1;
 }
 
-.opening-frame {
-  position: relative;
-  width: min(88vw, 720px);
-  min-height: min(82vh, 680px);
-  padding: 70px 50px;
-
-  border: 1px solid rgba(234, 209, 139, 0.75);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,0.04),
-      rgba(0,0,0,0.16)
-    );
-
-  box-shadow:
-    0 0 0 8px rgba(210,175,97,0.045),
-    inset 0 0 55px rgba(0,0,0,0.2),
-    0 30px 80px rgba(0,0,0,0.4);
+.opening-screen-active {
+  pointer-events: none;
 }
 
 .opening-content {
   position: relative;
-  z-index: 2;
+  z-index: 10;
   text-align: center;
-}
-
-.opening-bismillah {
-  font-family: "Amiri", serif;
-  color: var(--soft-gold);
-  font-size: 42px;
-  margin-bottom: 27px;
+  color: var(--cream);
+  padding: 30px;
+  transform: translateY(-4vh);
 }
 
 .opening-small {
-  color: #fff1d1;
   font-family: "Montserrat", sans-serif;
-  font-size: 9px;
-  letter-spacing: 3px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 5px;
+  color: var(--bright-gold);
+  margin-bottom: 20px;
+  text-shadow:
+    0 2px 15px rgba(0, 0, 0, 0.5);
 }
 
-.opening-divider {
-  color: var(--soft-gold);
-  font-size: 25px;
-  margin: 20px 0;
+.opening-ornament {
+  color: var(--bright-gold);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 30px;
+  margin-bottom: 10px;
+  text-shadow:
+    0 0 20px rgba(243, 217, 149, 0.45);
 }
 
 .opening-content h1 {
   margin: 0;
-
-  color: #fffaf0;
-
   font-family: "Cinzel", serif;
-  font-size: clamp(43px, 8vw, 72px);
-  font-weight: 500;
-  letter-spacing: 8px;
-
+  font-size: clamp(45px, 9vw, 82px);
+  font-weight: 600;
+  letter-spacing: 10px;
+  color: #fffaf0;
   text-shadow:
-    0 2px 18px rgba(234,209,139,0.16);
+    0 3px 25px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(243, 217, 149, 0.15);
 }
 
-.opening-subtitle {
-  color: #ead18b;
+.opening-content p {
+  margin: 12px 0 30px;
   font-family: "Great Vibes", cursive;
-  font-size: 30px;
-  margin-top: 4px;
+  font-size: clamp(24px, 4vw, 34px);
+  color: var(--bright-gold);
 }
 
 .open-invitation-button {
-  margin-top: 44px;
-
-  padding: 16px 38px;
-
-  border: 1px solid var(--soft-gold);
-
-  background: rgba(255,255,255,0.02);
-
-  color: #fffaf0;
-
+  border: 1px solid var(--bright-gold);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 250, 240, 0.06),
+      rgba(210, 175, 97, 0.14)
+    );
+  color: var(--cream);
+  padding: 15px 31px;
   font-family: "Montserrat", sans-serif;
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3px;
-
-  cursor: pointer;
-
+  font-weight: 600;
+  letter-spacing: 4px;
   transition:
-    background 0.35s ease,
-    color 0.35s ease,
-    transform 0.35s ease;
+    background 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  pointer-events: auto;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.25);
 }
 
 .open-invitation-button:hover {
-  background: var(--soft-gold);
-  color: var(--deep-burgundy);
+  background: rgba(210, 175, 97, 0.2);
   transform: translateY(-2px);
-}
-
-.corner {
-  position: absolute;
-  color: var(--soft-gold);
-  font-size: 29px;
-}
-
-.corner-top-left {
-  top: 18px;
-  left: 20px;
-}
-
-.corner-top-right {
-  top: 18px;
-  right: 20px;
-  transform: rotate(90deg);
-}
-
-.corner-bottom-left {
-  bottom: 18px;
-  left: 20px;
-  transform: rotate(-90deg);
-}
-
-.corner-bottom-right {
-  bottom: 18px;
-  right: 20px;
-  transform: rotate(180deg);
-}
-
-/* =========================================================
-   INVITATION
-========================================================= */
-
-.invitation-content {
-  position: relative;
-  z-index: 1;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.35);
 }
 
 /* =========================================================
    CURTAINS
 ========================================================= */
 
-.opening-curtain {
-  position: fixed;
+.curtain-container {
+  position: absolute;
   inset: 0;
-
-  z-index: 3000;
-
+  z-index: 20;
   pointer-events: none;
-
   overflow: hidden;
-
-  /*
-    IMPORTANT:
-    The parent must stay transparent.
-    Only the two curtain panels have colour.
-  */
-
-  background: transparent;
 }
 
-.curtain-panel {
+.curtain {
   position: absolute;
   top: 0;
-
-  width: 50.5%;
+  width: 53%;
   height: 100%;
-
-  overflow: hidden;
-
   background:
     linear-gradient(
       90deg,
       #24050a 0%,
-      #64131d 17%,
-      #8d2530 36%,
-      #5d1019 53%,
-      #8d2530 71%,
-      #35070e 100%
+      #4a0b15 10%,
+      #791c29 25%,
+      #4e0b15 43%,
+      #8a2531 56%,
+      #4c0b14 72%,
+      #25050a 100%
     );
-
   box-shadow:
-    inset 0 0 75px rgba(0,0,0,0.58),
-    inset 0 0 35px rgba(234,209,139,0.09);
-
+    inset 0 0 60px rgba(0, 0, 0, 0.65),
+    inset 0 0 18px rgba(243, 217, 149, 0.12);
   transition:
-    transform 1.8s
-    cubic-bezier(0.77,0,0.18,1);
+    transform 1.9s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.curtain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.28) 0,
+      rgba(0, 0, 0, 0.05) 7%,
+      rgba(255, 255, 255, 0.08) 12%,
+      rgba(0, 0, 0, 0.3) 19%
+    );
+  opacity: 0.9;
+}
+
+.curtain::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background:
+    linear-gradient(
+      to bottom,
+      var(--bright-gold),
+      var(--gold),
+      #9b7132,
+      var(--bright-gold)
+    );
+  opacity: 0.9;
 }
 
 .curtain-left {
   left: 0;
   transform: translateX(0);
-
-  border-right:
-    1px solid rgba(234,209,139,0.55);
+  transform-origin: left center;
 }
 
 .curtain-right {
   right: 0;
   transform: translateX(0);
-
-  border-left:
-    1px solid rgba(234,209,139,0.55);
+  transform-origin: right center;
 }
 
-.curtains-open .curtain-left {
-  transform: translateX(-100%);
+.curtain-left::after {
+  right: 0;
 }
 
-.curtains-open .curtain-right {
-  transform: translateX(100%);
+.curtain-right::after {
+  left: 0;
 }
 
-.curtain-shine {
-  position: absolute;
-  inset: 0;
+.opening-screen-open .curtain-left {
+  transform: translateX(-102%);
+}
 
-  background:
-    linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255,255,255,0.13) 18%,
-      transparent 28%,
-      rgba(0,0,0,0.2) 43%,
-      transparent 55%,
-      rgba(255,255,255,0.11) 68%,
-      transparent 78%
-    );
+.opening-screen-open .curtain-right {
+  transform: translateX(102%);
 }
 
 .curtain-folds {
   position: absolute;
   inset: 0;
-
   background:
     repeating-linear-gradient(
-      90deg,
-      rgba(0,0,0,0.2) 0,
-      rgba(0,0,0,0.2) 10px,
-      transparent 10px,
-      transparent 30px
+      92deg,
+      transparent 0,
+      transparent 5%,
+      rgba(0, 0, 0, 0.25) 7%,
+      transparent 11%,
+      rgba(255, 255, 255, 0.08) 14%,
+      transparent 18%
     );
-
-  opacity: 0.55;
+  mix-blend-mode: multiply;
 }
 
-.curtain-centre {
+.curtain-edge {
   position: absolute;
-
-  left: 50%;
   top: 0;
-
-  width: 2px;
-  height: 100%;
-
-  transform: translateX(-50%);
-
+  bottom: 0;
+  width: 28px;
   background:
     linear-gradient(
-      to bottom,
+      90deg,
       transparent,
-      var(--soft-gold),
+      rgba(243, 217, 149, 0.16),
       transparent
     );
-
-  opacity: 0.7;
-}
-
-.curtain-tassel {
-  position: absolute;
-  top: 50%;
-
-  color: var(--soft-gold);
-
-  font-size: 45px;
-
-  transform: translateY(-50%);
-
-  text-shadow:
-    0 3px 12px rgba(0,0,0,0.55);
-}
-
-.curtain-left .curtain-tassel {
-  right: 22px;
-}
-
-.curtain-right .curtain-tassel {
-  left: 22px;
 }
 
 /* =========================================================
-   MUSIC
+   INVITATION
 ========================================================= */
 
-.music-button {
-  position: fixed;
-
-  right: 22px;
-  bottom: 22px;
-
-  z-index: 4000;
-
-  width: 48px;
-  height: 48px;
-
-  border-radius: 50%;
-
-  border:
-    1px solid var(--soft-gold);
-
+.invitation {
+  min-height: 100vh;
+  opacity: 0;
+  visibility: hidden;
   background:
-    linear-gradient(
-      145deg,
-      #721722,
-      #4e0d15
-    );
+    radial-gradient(
+      circle at top center,
+      rgba(210, 175, 97, 0.07),
+      transparent 32%
+    ),
+    var(--cream);
+  transition:
+    opacity 0.8s ease,
+    visibility 0.8s ease;
+}
 
-  color: var(--soft-gold);
-
-  font-family: "Montserrat", sans-serif;
-  font-size: 15px;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 8px 25px rgba(0,0,0,0.24);
+.invitation-visible {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* =========================================================
@@ -433,560 +339,356 @@ a {
 ========================================================= */
 
 .hero-section {
-  min-height: 100vh;
-
+  max-width: 900px;
+  margin: 0 auto;
   padding:
-    80px 20px 70px;
-
+    90px 25px
+    65px;
   text-align: center;
-
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(210,175,97,0.15),
-      transparent 34%
-    ),
-    var(--ivory);
 }
 
-.hero-bismillah {
+.quran-arabic {
   font-family: "Amiri", serif;
-
-  font-size: 42px;
-
+  font-size: 29px;
   color: var(--burgundy);
-
   margin-bottom: 15px;
 }
 
 .quran-verse {
   font-family: "Amiri", serif;
-
-  /*
-    Reduced from the previous larger size.
-  */
-
   font-size: clamp(25px, 4vw, 39px);
-
-  color: #6b1823;
-
-  line-height: 1.5;
+  line-height: 1.6;
+  color: var(--burgundy);
+  margin-bottom: 10px;
 }
 
 .quran-translation {
-  margin-top: 5px;
-
-  font-family:
-    "Cormorant Garamond",
-    serif;
-
-  font-size: 18px;
-
+  font-family: "Cormorant Garamond", serif;
   font-style: italic;
-
-  color: #624b43;
+  font-size: 19px;
+  color: var(--warm-text);
 }
 
 .quran-reference {
-  margin-top: 6px;
-
+  margin-top: 8px;
   font-family: "Montserrat", sans-serif;
-
   font-size: 9px;
-
   letter-spacing: 2px;
-
-  color: #987b43;
+  color: var(--gold);
+  text-transform: uppercase;
 }
 
 .family-name {
-  margin-top: 45px;
-
+  margin-top: 44px;
   font-family: "Cinzel", serif;
-
-  /*
-    Increased two sizes and bold.
-  */
-
   font-size: 22px;
-
   font-weight: 700;
-
   letter-spacing: 2px;
-
-  color: #65131e;
-
-  text-shadow:
-    0 1px 0 rgba(255,255,255,0.5);
+  color: var(--burgundy);
 }
 
-.grandparents {
-  max-width: 750px;
-
-  margin:
-    12px auto 0;
-
+.family-line {
+  max-width: 700px;
+  margin: 13px auto 0;
+  font-family: "Cormorant Garamond", serif;
   font-size: 17px;
-
-  line-height: 1.5;
-
-  color: var(--text-warm);
+  line-height: 1.45;
+  color: var(--warm-text);
 }
 
 .invite-line {
-  margin-top: 43px;
-
-  font-family:
-    "Cormorant Garamond",
-    serif;
-
-  font-size: 19px;
-
+  margin-top: 45px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
   font-style: italic;
-
-  color: #5d4640;
+  color: var(--warm-text);
 }
 
 .ceremony-title {
-  margin-top: 10px;
-
+  margin: 12px 0;
   font-family: "Cinzel", serif;
-
-  font-size:
-    clamp(27px, 5vw, 45px);
-
+  font-size: clamp(31px, 6vw, 53px);
   font-weight: 600;
-
   letter-spacing: 4px;
-
-  color: #68131e;
-}
-
-.beloved-line {
-  margin-top: 7px;
-
-  font-family: "Great Vibes", cursive;
-
-  color: #721722;
-
-  font-size: 31px;
+  color: var(--burgundy);
 }
 
 /* =========================================================
    PHOTOS
+   NO FRAME
+   NO BORDER
+   NO BOX
+   NO SHADOW
 ========================================================= */
 
-.couple-images {
-  max-width: 850px;
-
-  margin:
-    42px auto 0;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 28px;
+.couple-photos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(25px, 6vw, 80px);
+  margin: 42px auto 45px;
 }
 
-/*
-  IMPORTANT:
-  There is NO frame around the photos.
-*/
+.photo-only {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .couple-image {
-  width: 100%;
-
   display: block;
-
-  aspect-ratio: 1 / 1;
-
-  object-fit: cover;
-
-  border: none;
-
-  outline: none;
-
-  box-shadow: none;
-
-  background: transparent;
+  width: clamp(145px, 24vw, 245px);
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  object-fit: contain;
 }
 
 /* =========================================================
-   MESSAGE
+   INTRO
 ========================================================= */
 
 .love-heading {
-  margin-top: 48px;
-
   font-family: "Cinzel", serif;
-
-  font-size:
-    clamp(20px, 4vw, 31px);
-
-  letter-spacing: 3px;
-
-  line-height: 1.6;
-
-  color: #68131e;
+  font-size: clamp(20px, 3vw, 27px);
+  line-height: 1.55;
+  letter-spacing: 2px;
+  color: var(--burgundy);
+  font-weight: 600;
 }
 
-.hero-message {
-  max-width: 720px;
-
-  margin:
-    25px auto 0;
-
-  font-size: 20px;
-
-  line-height: 1.6;
-
-  color: var(--text-warm);
-}
-
-.hero-message p {
-  margin:
-    0 0 12px;
+.intro-text {
+  max-width: 650px;
+  margin: 25px auto 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--warm-text);
 }
 
 /* =========================================================
-   SCRATCH DATE
+   SCRATCH CARD
 ========================================================= */
 
-.scratch-date-section {
-  margin-top: 48px;
+.scratch-section {
+  max-width: 650px;
+  margin: 0 auto;
+  padding:
+    15px 25px
+    65px;
+  text-align: center;
 }
 
 .scratch-card {
   position: relative;
-
-  width: min(90vw, 560px);
-
-  height: 190px;
-
-  margin:
-    0 auto;
-
-  overflow: hidden;
-
-  border:
-    1px solid var(--gold);
-
+  width: 100%;
+  max-width: 550px;
+  height: 205px;
+  margin: 0 auto;
   background:
-    linear-gradient(
-      145deg,
-      #fffdf8,
-      #f3e8d4
-    );
-
-  box-shadow:
-    0 10px 30px
-    rgba(93,18,27,0.08);
-}
-
-.scratch-card.scratch-complete {
-  border-color: var(--gold);
+    radial-gradient(
+      circle at center,
+      rgba(210, 175, 97, 0.07),
+      transparent 65%
+    ),
+    var(--cream);
+  overflow: hidden;
 }
 
 .scratch-canvas {
   position: absolute;
-
   inset: 0;
-
   display: block;
-
   width: 100%;
   height: 100%;
-
+  z-index: 3;
   cursor: crosshair;
-
   touch-action: none;
-
   user-select: none;
-
   -webkit-user-select: none;
-
-  -webkit-touch-callout: none;
 }
 
 .revealed-date {
   position: absolute;
-
   inset: 0;
-
   display: flex;
-
   flex-direction: column;
-
-  align-items: center;
-
   justify-content: center;
-
-  opacity: 1;
+  align-items: center;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(210, 175, 97, 0.09),
+      transparent 60%
+    );
 }
 
-.date-number {
+.date-main {
   font-family: "Cinzel", serif;
-
-  font-size:
-    clamp(24px, 5vw, 40px);
-
+  font-size: clamp(26px, 5vw, 42px);
   letter-spacing: 4px;
-
-  color: #68131e;
+  font-weight: 600;
+  color: var(--burgundy);
 }
 
 .date-day {
-  margin-top: 8px;
-
+  margin-top: 10px;
   font-family: "Montserrat", sans-serif;
-
-  font-size: 13px;
-
-  letter-spacing: 5px;
-
-  color: #a47e35;
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--gold);
+  font-weight: 600;
 }
 
-.scratch-hint {
-  margin-top: 13px;
+.date-gift-message {
+  max-width: 520px;
+  margin: 25px auto 0;
+  padding: 18px 25px;
+  border: 1px solid var(--gold);
+  background:
+    rgba(255, 250, 240, 0.65);
+}
 
-  font-family: "Montserrat", sans-serif;
+.gift-title {
+  font-family: "Cinzel", serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--burgundy);
+  font-weight: 600;
+}
 
-  font-size: 10px;
-
-  letter-spacing: 1.5px;
-
-  color: #806b61;
+.gift-text {
+  margin-top: 8px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--warm-text);
 }
 
 /* =========================================================
-   NO BOX GIFTS
+   CONTENT SECTIONS
+   IMPORTANT:
+   THERE ARE NO GOLD DIVIDER LINES.
 ========================================================= */
 
-.date-gift-message {
-  max-width: 620px;
-
-  margin:
-    30px auto 0;
-
+.content-section {
+  max-width: 850px;
+  margin: 0 auto;
   padding:
-    24px 25px;
-
-  border:
-    1px solid var(--gold);
-
-  background:
-    rgba(255,250,240,0.82);
-
+    65px 25px;
   text-align: center;
-
-  box-shadow:
-    0 8px 25px
-    rgba(93,18,27,0.05);
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-.date-gift-message .gift-title {
-  font-family: "Cinzel", serif;
+.content-section::before,
+.content-section::after {
+  display: none !important;
+  content: none !important;
+}
 
-  font-size: 16px;
-
+.section-kicker {
+  font-family: "Montserrat", sans-serif;
+  font-size: 10px;
   font-weight: 600;
-
-  letter-spacing: 3px;
-
-  color: #68131e;
+  letter-spacing: 4px;
+  color: var(--gold);
+  margin-bottom: 28px;
 }
 
-.date-gift-message p {
-  margin:
-    10px auto 0;
+.content-section h3 {
+  margin: 0;
+  font-family: "Cinzel", serif;
+  font-size: clamp(27px, 5vw, 40px);
+  font-weight: 500;
+  color: var(--burgundy);
+}
 
-  font-family:
-    "Cormorant Garamond",
-    serif;
-
-  font-size: 18px;
-
-  line-height: 1.5;
-
-  color: #38231f;
+.venue-address {
+  margin-top: 16px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 19px;
+  line-height: 1.6;
+  color: var(--warm-text);
 }
 
 /* =========================================================
    COUNTDOWN
 ========================================================= */
 
-.countdown-section {
-  padding:
-    80px 20px;
-
-  text-align: center;
-
-  background:
-    linear-gradient(
-      180deg,
-      #fffaf0,
-      #f5e8d4
-    );
-
-  /*
-    No unwanted gold dividing line.
-  */
-
-  border-top: none;
-}
-
-.section-heading {
-  font-family: "Cinzel", serif;
-
-  font-size: 28px;
-
-  letter-spacing: 5px;
-
-  color: #68131e;
-}
-
 .countdown {
-  max-width: 850px;
-
-  margin:
-    40px auto 0;
-
   display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  gap: 18px;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 650px;
+  margin: 0 auto 35px;
+  gap: 10px;
+  border: none !important;
 }
 
-.countdown-box {
-  padding:
-    28px 10px;
-
-  border:
-    1px solid
-    rgba(210,175,97,0.7);
-
-  background:
-    rgba(255,255,255,0.5);
+.countdown-item {
+  padding: 10px;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-.countdown-box span {
+.countdown-item span {
   display: block;
-
-  font-family: "Bodoni Moda", serif;
-
-  font-size: 42px;
-
-  color: #68131e;
+  font-family: "Cinzel", serif;
+  font-size: clamp(28px, 5vw, 42px);
+  color: var(--burgundy);
 }
 
-.countdown-box small {
+.countdown-item small {
   display: block;
-
   margin-top: 6px;
-
   font-family: "Montserrat", sans-serif;
-
-  font-size: 9px;
-
+  font-size: 8px;
   letter-spacing: 2px;
-
-  color: #806b61;
-}
-
-.after-countdown {
-  margin-top: 35px;
-}
-
-.calendar-button,
-.directions-button {
-  display: inline-block;
-
-  padding:
-    14px 28px;
-
-  border:
-    1px solid var(--gold);
-
-  background:
-    #68131e;
-
-  color: #fffaf0;
-
-  text-decoration: none;
-
-  font-family: "Montserrat", sans-serif;
-
-  font-size: 10px;
-
-  letter-spacing: 2px;
-
-  cursor: pointer;
-
-  transition:
-    all 0.3s ease;
-}
-
-.calendar-button:hover,
-.directions-button:hover {
-  background:
-    #35070e;
-
-  transform:
-    translateY(-2px);
+  color: var(--gold);
 }
 
 /* =========================================================
-   VENUE
+   BUTTONS
 ========================================================= */
 
-.venue-section {
-  padding:
-    80px 20px;
-
-  text-align: center;
-
-  background:
-    var(--ivory);
+.gold-button {
+  display: inline-block;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--burgundy);
+  padding: 13px 25px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-decoration: none;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
-.venue-card {
-  max-width: 650px;
-
-  margin:
-    35px auto 0;
-
-  padding:
-    45px 25px;
-
-  border:
-    1px solid var(--gold);
-
-  background:
-    rgba(255,255,255,0.38);
+.gold-button:hover {
+  background: var(--burgundy);
+  color: var(--cream);
+  transform: translateY(-2px);
 }
 
-.venue-name {
-  font-family: "Cinzel", serif;
-
-  font-size: 30px;
-
-  color: #68131e;
-}
-
-.venue-address {
-  margin:
-    18px 0 30px;
-
-  font-size: 21px;
-
-  line-height: 1.5;
-
-  color: var(--text-warm);
+.link-button {
+  margin-top: 25px;
 }
 
 /* =========================================================
@@ -994,62 +696,31 @@ a {
 ========================================================= */
 
 .programme-section {
-  padding:
-    80px 20px;
-
-  text-align: center;
-
-  background:
-    #fffaf0;
+  max-width: 650px;
 }
 
 .programme-list {
-  max-width: 750px;
-
-  margin:
-    35px auto 0;
-
-  border-top:
-    1px solid
-    rgba(210,175,97,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
 .programme-item {
-  display: grid;
-
-  grid-template-columns:
-    180px 1fr;
-
-  gap: 20px;
-
-  padding:
-    22px 10px;
-
-  border-bottom:
-    1px solid
-    rgba(210,175,97,0.5);
-
-  align-items: center;
+  padding: 15px 0;
+  border: none !important;
 }
 
 .programme-time {
-  font-family: "Montserrat", sans-serif;
-
-  font-size: 12px;
-
-  letter-spacing: 2px;
-
-  color: #a47e35;
+  font-family: "Cinzel", serif;
+  font-size: 25px;
+  color: var(--burgundy);
 }
 
-.programme-event {
-  text-align: left;
-
-  font-family: "Cinzel", serif;
-
-  font-size: 20px;
-
-  color: #68131e;
+.programme-name {
+  margin-top: 4px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  color: var(--warm-text);
 }
 
 /* =========================================================
@@ -1057,39 +728,22 @@ a {
 ========================================================= */
 
 .welcome-section {
-  padding:
-    85px 20px;
-
-  text-align: center;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(210,175,97,0.11),
-      transparent 55%
-    ),
-    var(--ivory);
+  max-width: 650px;
 }
 
-.welcome-section p {
-  max-width: 680px;
-
-  margin:
-    30px auto 0;
-
-  font-size: 22px;
-
-  line-height: 1.6;
-
-  color: var(--text-warm);
+.welcome-text {
+  margin: 0 auto;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
+  line-height: 1.7;
+  color: var(--warm-text);
 }
 
-.welcome-ornament {
-  margin-top: 25px;
-
-  color: #b18a40;
-
-  font-size: 35px;
+.large-ornament {
+  margin-top: 30px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 28px;
+  color: var(--gold);
 }
 
 /* =========================================================
@@ -1097,86 +751,69 @@ a {
 ========================================================= */
 
 .rsvp-section {
-  padding:
-    80px 20px;
-
-  text-align: center;
-
-  background:
-    #fffaf0;
-}
-
-.rsvp-card {
-  max-width: 500px;
-
-  margin:
-    35px auto 0;
-
-  padding:
-    38px 25px;
-
-  border:
-    1px solid var(--gold);
+  padding-bottom: 90px;
 }
 
 .rsvp-name {
   font-family: "Cinzel", serif;
-
-  font-size: 24px;
-
-  color: #68131e;
+  font-size: 23px;
+  color: var(--burgundy);
 }
 
 .rsvp-phone {
   display: inline-block;
-
-  margin-top: 14px;
-
+  margin-top: 8px;
   font-family: "Montserrat", sans-serif;
-
-  font-size: 15px;
-
-  letter-spacing: 1px;
-
-  color: #68131e;
-
+  font-size: 14px;
+  color: var(--warm-text);
   text-decoration: none;
 }
 
 .rsvp-phone:hover {
-  text-decoration: underline;
+  color: var(--burgundy);
+}
+
+.with-love {
+  margin-top: 25px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: var(--gold);
 }
 
 /* =========================================================
-   FOOTER
+   MUSIC BUTTON
 ========================================================= */
 
-.footer {
-  padding:
-    55px 20px;
-
-  text-align: center;
-
+.music-button {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 999;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
   background:
-    #28060c;
-
-  color:
-    var(--soft-gold);
+    rgba(40, 6, 12, 0.94);
+  color: var(--bright-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.22);
 }
 
-.footer-ornament {
-  font-size: 28px;
-}
-
-.footer-text {
-  margin:
-    14px 0;
-
+.music-icon {
   font-family: "Montserrat", sans-serif;
+  font-size: 17px;
+}
 
-  font-size: 10px;
-
-  letter-spacing: 4px;
+.music-button-playing {
+  box-shadow:
+    0 0 0 5px rgba(210, 175, 97, 0.08),
+    0 8px 25px rgba(0, 0, 0, 0.22);
 }
 
 /* =========================================================
@@ -1185,47 +822,49 @@ a {
 
 @media (max-width: 700px) {
 
-  .opening-frame {
-    width: 88vw;
-    min-height: 75vh;
-    padding: 55px 25px;
-  }
-
-  .opening-bismillah {
-    font-size: 34px;
+  .opening-content {
+    padding: 20px;
+    transform: translateY(-3vh);
   }
 
   .opening-small {
     font-size: 8px;
-    letter-spacing: 2.5px;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .opening-ornament {
+    font-size: 25px;
   }
 
   .opening-content h1 {
-    font-size: 43px;
-    letter-spacing: 5px;
+    font-size: clamp(39px, 14vw, 65px);
+    letter-spacing: 6px;
   }
 
-  .opening-subtitle {
-    font-size: 27px;
+  .opening-content p {
+    font-size: 24px;
+    margin-bottom: 26px;
   }
 
   .open-invitation-button {
-    margin-top: 38px;
-    padding:
-      14px 25px;
+    padding: 13px 24px;
+    font-size: 9px;
+    letter-spacing: 3px;
   }
 
   .hero-section {
     padding:
-      60px 16px 55px;
+      70px 18px
+      50px;
   }
 
-  .hero-bismillah {
-    font-size: 36px;
+  .quran-arabic {
+    font-size: 25px;
   }
 
   .quran-verse {
-    font-size: 26px;
+    font-size: 25px;
   }
 
   .quran-translation {
@@ -1233,176 +872,108 @@ a {
   }
 
   .family-name {
-    margin-top: 35px;
-
-    /*
-      Still larger and bold on mobile.
-    */
-
+    margin-top: 34px;
     font-size: 20px;
-
-    font-weight: 700;
-
-    letter-spacing: 1.2px;
+    letter-spacing: 1px;
   }
 
-  .grandparents {
+  .family-line {
     font-size: 15px;
   }
 
   .invite-line {
-    margin-top: 35px;
-    font-size: 18px;
+    margin-top: 36px;
+    font-size: 16px;
   }
 
   .ceremony-title {
-    font-size: 27px;
+    font-size: 28px;
     letter-spacing: 2px;
   }
 
-  .beloved-line {
-    font-size: 27px;
-  }
-
-  .couple-images {
-    grid-template-columns:
-      1fr 1fr;
-
-    gap: 12px;
-
-    margin-top: 30px;
+  .couple-photos {
+    gap: 16px;
+    margin-top: 35px;
+    margin-bottom: 35px;
   }
 
   .couple-image {
-    border: none;
-    box-shadow: none;
+    width: min(42vw, 185px);
   }
 
   .love-heading {
-    margin-top: 35px;
     font-size: 18px;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
   }
 
-  .hero-message {
-    font-size: 18px;
-  }
-
-  .scratch-card {
-    height: 170px;
-  }
-
-  .date-number {
-    font-size: 23px;
-    letter-spacing: 2px;
-  }
-
-  .date-day {
-    font-size: 10px;
-    letter-spacing: 3px;
-  }
-
-  .date-gift-message {
-    margin-top: 25px;
-    padding:
-      20px 16px;
-  }
-
-  .date-gift-message .gift-title {
-    font-size: 13px;
-    letter-spacing: 2px;
-  }
-
-  .date-gift-message p {
+  .intro-text {
     font-size: 17px;
   }
 
-  .countdown-section,
-  .venue-section,
-  .programme-section,
-  .welcome-section,
-  .rsvp-section {
-    padding:
-      60px 16px;
+  .scratch-section {
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
-  .section-heading {
-    font-size: 22px;
-    letter-spacing: 3px;
+  .scratch-card {
+    height: 180px;
+  }
+
+  .date-main {
+    font-size: 25px;
+    letter-spacing: 2px;
+  }
+
+  .date-gift-message {
+    padding: 16px 17px;
+  }
+
+  .gift-title {
+    font-size: 13px;
+  }
+
+  .gift-text {
+    font-size: 15px;
+  }
+
+  .content-section {
+    padding:
+      55px 20px;
   }
 
   .countdown {
-    grid-template-columns:
-      repeat(2, 1fr);
-
-    gap: 12px;
-
-    margin-top: 30px;
+    gap: 3px;
   }
 
-  .countdown-box {
-    padding:
-      22px 8px;
+  .countdown-item {
+    padding: 5px 2px;
   }
 
-  .countdown-box span {
-    font-size: 34px;
+  .countdown-item span {
+    font-size: 26px;
   }
 
-  .venue-name {
-    font-size: 25px;
+  .countdown-item small {
+    font-size: 7px;
+    letter-spacing: 1px;
   }
 
-  .venue-address {
-    font-size: 19px;
+  .programme-time {
+    font-size: 22px;
   }
 
-  .programme-item {
-    grid-template-columns: 1fr;
-    gap: 6px;
-    text-align: center;
+  .programme-name {
+    font-size: 17px;
   }
 
-  .programme-event {
-    text-align: center;
+  .welcome-text {
     font-size: 18px;
-  }
-
-  .welcome-section p {
-    font-size: 19px;
   }
 
   .music-button {
     right: 15px;
     bottom: 15px;
-    width: 44px;
-    height: 44px;
-  }
-}
-
-@media (max-width: 420px) {
-
-  .opening-content h1 {
-    font-size: 38px;
-  }
-
-  .opening-small {
-    letter-spacing: 2px;
-  }
-
-  .couple-images {
-    gap: 8px;
-  }
-
-  .scratch-card {
-    height: 155px;
-  }
-
-  .date-number {
-    font-size: 20px;
-  }
-
-  .countdown-box span {
-    font-size: 30px;
+    width: 45px;
+    height: 45px;
   }
 }
