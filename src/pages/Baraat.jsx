@@ -12,13 +12,6 @@ function Baraat() {
   const [scratched, setScratched] = useState(false);
   const [musicPlaying, setMusicPlaying] = useState(false);
 
-  const canvasRef = useRef(null);
-  const playerRef = useRef(null);
-  const scratchingRef = useRef(false);
-  const musicStartedRef = useRef(false);
-  const pendingMusicRef = useRef(false);
-  const playerReadyRef = useRef(false);
-
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
     hours: "00",
@@ -26,7 +19,17 @@ function Baraat() {
     seconds: "00",
   });
 
-  /* ---------------- COUNTDOWN ---------------- */
+  const canvasRef = useRef(null);
+  const playerRef = useRef(null);
+
+  const scratchingRef = useRef(false);
+  const musicStartedRef = useRef(false);
+  const pendingMusicRef = useRef(false);
+  const playerReadyRef = useRef(false);
+
+  /* =========================
+     COUNTDOWN
+  ========================= */
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -42,13 +45,18 @@ function Baraat() {
         return;
       }
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const days = Math.floor(
+        difference / (1000 * 60 * 60 * 24)
+      );
+
       const hours = Math.floor(
         (difference / (1000 * 60 * 60)) % 24
       );
+
       const minutes = Math.floor(
         (difference / (1000 * 60)) % 60
       );
+
       const seconds = Math.floor(
         (difference / 1000) % 60
       );
@@ -68,167 +76,210 @@ function Baraat() {
     return () => clearInterval(timer);
   }, []);
 
-  /* ---------------- YOUTUBE MUSIC ---------------- */
+  /* =========================
+     YOUTUBE MUSIC
+  ========================= */
 
   useEffect(() => {
     const createPlayer = () => {
       if (!window.YT || !window.YT.Player) return;
+
       if (playerRef.current) return;
 
-      playerRef.current = new window.YT.Player("baraat-youtube-player", {
-        width: "1",
-        height: "1",
-        videoId: MUSIC_VIDEO_ID,
+      playerRef.current = new window.YT.Player(
+        "baraat-youtube-player",
+        {
+          width: "1",
+          height: "1",
 
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          start: MUSIC_START,
-          enablejsapi: 1,
-          origin: window.location.origin,
-        },
+          videoId: MUSIC_VIDEO_ID,
 
-        events: {
-          onReady: (event) => {
-            playerReadyRef.current = true;
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            start: MUSIC_START,
+            enablejsapi: 1,
+            origin: window.location.origin,
+          },
 
-            try {
-              event.target.setVolume(85);
-              event.target.seekTo(MUSIC_START, true);
-            } catch (error) {
-              console.log("YouTube setup:", error);
-            }
+          events: {
+            onReady: (event) => {
+              playerReadyRef.current = true;
 
-            if (pendingMusicRef.current) {
               try {
+                event.target.setVolume(85);
                 event.target.seekTo(MUSIC_START, true);
-                event.target.playVideo();
-                musicStartedRef.current = true;
+              } catch (error) {
+                console.log("YouTube setup error:", error);
+              }
+
+              if (pendingMusicRef.current) {
+                try {
+                  event.target.seekTo(MUSIC_START, true);
+                  event.target.playVideo();
+
+                  musicStartedRef.current = true;
+                  setMusicPlaying(true);
+                } catch (error) {
+                  console.log(
+                    "Music playback error:",
+                    error
+                  );
+                }
+              }
+            },
+
+            onStateChange: (event) => {
+              if (
+                window.YT &&
+                event.data ===
+                  window.YT.PlayerState.PLAYING
+              ) {
                 setMusicPlaying(true);
-                pendingMusicRef.current = false;
-              } catch (error) {
-                console.log("YouTube playback:", error);
               }
-            }
-          },
 
-          onStateChange: (event) => {
-            if (!window.YT) return;
-
-            if (event.data === window.YT.PlayerState.PLAYING) {
-              setMusicPlaying(true);
-            }
-
-            if (
-              event.data === window.YT.PlayerState.PAUSED ||
-              event.data === window.YT.PlayerState.ENDED
-            ) {
-              setMusicPlaying(false);
-            }
-
-            if (event.data === window.YT.PlayerState.ENDED) {
-              try {
-                event.target.seekTo(MUSIC_START, true);
-                event.target.playVideo();
-              } catch (error) {
-                console.log("YouTube restart:", error);
+              if (
+                window.YT &&
+                event.data ===
+                  window.YT.PlayerState.PAUSED
+              ) {
+                setMusicPlaying(false);
               }
-            }
+
+              if (
+                window.YT &&
+                event.data ===
+                  window.YT.PlayerState.ENDED
+              ) {
+                try {
+                  event.target.seekTo(MUSIC_START, true);
+                  event.target.playVideo();
+                } catch (error) {
+                  console.log(
+                    "Music loop error:",
+                    error
+                  );
+                }
+              }
+            },
           },
-        },
-      });
+        }
+      );
     };
 
-    const loadYouTubeAPI = () => {
-      if (window.YT && window.YT.Player) {
-        createPlayer();
-        return;
-      }
+    if (window.YT && window.YT.Player) {
+      createPlayer();
+      return;
+    }
 
-      if (document.getElementById("youtube-iframe-api")) {
-        return;
-      }
+    const existingScript = document.querySelector(
+      'script[src="https://www.youtube.com/iframe_api"]'
+    );
 
+    if (!existingScript) {
       const script = document.createElement("script");
-      script.id = "youtube-iframe-api";
-      script.src = "https://www.youtube.com/iframe_api";
+
+      script.src =
+        "https://www.youtube.com/iframe_api";
+
       script.async = true;
 
       document.body.appendChild(script);
+    }
 
-      window.onYouTubeIframeAPIReady = () => {
-        createPlayer();
-      };
+    const previousCallback =
+      window.onYouTubeIframeAPIReady;
+
+    window.onYouTubeIframeAPIReady = () => {
+      if (previousCallback) {
+        previousCallback();
+      }
+
+      createPlayer();
     };
 
-    loadYouTubeAPI();
-
-    const fallbackTimer = setInterval(() => {
-      if (window.YT && window.YT.Player && !playerRef.current) {
-        createPlayer();
-      }
-    }, 500);
-
     return () => {
-      clearInterval(fallbackTimer);
+      window.onYouTubeIframeAPIReady =
+        previousCallback;
     };
   }, []);
 
-  /* ---------------- OPEN INVITATION ---------------- */
+  /* =========================
+     OPEN INVITATION
+  ========================= */
 
   const openInvitation = () => {
-    if (invitationOpen) return;
-
     setInvitationOpen(true);
-
-    /*
-      The music is deliberately started from this click.
-      This is important because browsers generally block
-      audio autoplay unless the user has interacted with the page.
-    */
 
     pendingMusicRef.current = true;
 
-    if (playerRef.current && playerReadyRef.current) {
+    /*
+      Music starts only after the user's tap.
+      This keeps browser autoplay restrictions
+      satisfied.
+    */
+
+    if (
+      playerRef.current &&
+      playerReadyRef.current
+    ) {
       try {
-        playerRef.current.seekTo(MUSIC_START, true);
+        playerRef.current.seekTo(
+          MUSIC_START,
+          true
+        );
+
         playerRef.current.playVideo();
 
         musicStartedRef.current = true;
-        pendingMusicRef.current = false;
         setMusicPlaying(true);
       } catch (error) {
-        console.log("Music start:", error);
+        console.log(
+          "Unable to start music:",
+          error
+        );
       }
     }
 
-    setTimeout(() => {
-      setCurtainsOpen(true);
-    }, 250);
+    /*
+      Curtains open after the tap.
+      The opening screen remains in the DOM
+      only during the curtain animation.
+    */
+
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setCurtainsOpen(true);
+      }, 250);
+    });
   };
 
-  /* ---------------- MUSIC BUTTON ---------------- */
+  /* =========================
+     MUSIC BUTTON
+  ========================= */
 
   const toggleMusic = () => {
-    if (!playerRef.current || !playerReadyRef.current) {
-      pendingMusicRef.current = true;
+    if (
+      !playerRef.current ||
+      !playerReadyRef.current
+    ) {
       return;
     }
 
     try {
-      const state = playerRef.current.getPlayerState();
-
-      if (
-        state === window.YT.PlayerState.PLAYING
-      ) {
+      if (musicPlaying) {
         playerRef.current.pauseVideo();
         setMusicPlaying(false);
       } else {
         if (!musicStartedRef.current) {
-          playerRef.current.seekTo(MUSIC_START, true);
+          playerRef.current.seekTo(
+            MUSIC_START,
+            true
+          );
+
           musicStartedRef.current = true;
         }
 
@@ -236,11 +287,16 @@ function Baraat() {
         setMusicPlaying(true);
       }
     } catch (error) {
-      console.log("Music toggle:", error);
+      console.log(
+        "Music button error:",
+        error
+      );
     }
   };
 
-  /* ---------------- SCRATCH CARD ---------------- */
+  /* =========================
+     SCRATCH CARD
+  ========================= */
 
   useEffect(() => {
     if (!invitationOpen) return;
@@ -249,81 +305,106 @@ function Baraat() {
 
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d", {
+    const context = canvas.getContext("2d", {
       willReadFrequently: true,
     });
 
-    if (!ctx) return;
+    if (!context) return;
 
     const setupCanvas = () => {
       const rect = canvas.getBoundingClientRect();
 
-      const width = Math.max(1, Math.round(rect.width));
-      const height = Math.max(1, Math.round(rect.height));
-
-      const dpr = Math.min(window.devicePixelRatio || 1, 3);
-
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      /*
-        Scratch surface
-      */
-
-      const gradient = ctx.createLinearGradient(
-        0,
-        0,
-        width,
-        height
+      const dpr = Math.min(
+        window.devicePixelRatio || 1,
+        2
       );
 
-      gradient.addColorStop(0, "#3b0911");
-      gradient.addColorStop(0.5, "#701522");
-      gradient.addColorStop(1, "#3b0911");
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
 
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-
-      /*
-        Subtle gold border inside the scratch card.
-      */
-
-      ctx.strokeStyle = "#d2af61";
-      ctx.lineWidth = 1.5;
-
-      ctx.strokeRect(
-        10,
-        10,
-        width - 20,
-        height - 20
+      context.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
       );
 
       /*
-        Scratch instructions
+        Burgundy scratch surface.
       */
 
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      const gradient = context.createLinearGradient(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
 
-      ctx.fillStyle = "#fffaf0";
-      ctx.font = "600 13px Montserrat, sans-serif";
-      ctx.letterSpacing = "2px";
+      gradient.addColorStop(
+        0,
+        "#3b0a12"
+      );
 
-      ctx.fillText(
+      gradient.addColorStop(
+        0.5,
+        "#721522"
+      );
+
+      gradient.addColorStop(
+        1,
+        "#3d0a12"
+      );
+
+      context.fillStyle = gradient;
+      context.fillRect(
+        0,
+        0,
+        rect.width,
+        rect.height
+      );
+
+      /*
+        Inner gold border.
+      */
+
+      context.strokeStyle = "#d2af61";
+      context.lineWidth = 1.5;
+
+      context.strokeRect(
+        10,
+        10,
+        rect.width - 20,
+        rect.height - 20
+      );
+
+      /*
+        Scratch instructions.
+      */
+
+      context.fillStyle = "#f3d995";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+
+      context.font =
+        "600 15px Montserrat, sans-serif";
+
+      context.fillText(
         "SCRATCH TO REVEAL",
-        width / 2,
-        height / 2 - 10
+        rect.width / 2,
+        rect.height / 2 - 12
       );
 
-      ctx.fillStyle = "#ead18b";
-      ctx.font = "400 11px Montserrat, sans-serif";
+      context.fillStyle = "#fffaf0";
 
-      ctx.fillText(
+      context.font =
+        "400 11px Montserrat, sans-serif";
+
+      context.fillText(
         "Gently scratch the card",
-        width / 2,
-        height / 2 + 18
+        rect.width / 2,
+        rect.height / 2 + 15
       );
     };
 
@@ -335,113 +416,162 @@ function Baraat() {
       }
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
     };
   }, [invitationOpen, scratched]);
 
-  const scratchAt = (clientX, clientY) => {
+  const getScratchPosition = (event) => {
+    const canvas = canvasRef.current;
+
+    if (!canvas) return null;
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+    let clientX;
+    let clientY;
+
+    if (
+      event.touches &&
+      event.touches.length > 0
+    ) {
+      clientX =
+        event.touches[0].clientX;
+
+      clientY =
+        event.touches[0].clientY;
+    } else if (
+      event.changedTouches &&
+      event.changedTouches.length > 0
+    ) {
+      clientX =
+        event.changedTouches[0].clientX;
+
+      clientY =
+        event.changedTouches[0].clientY;
+    } else {
+      clientX = event.clientX;
+      clientY = event.clientY;
+    }
+
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const scratch = (event) => {
     if (scratched) return;
 
     const canvas = canvasRef.current;
 
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
+    const context = canvas.getContext("2d");
 
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    if (!context) return;
 
-    const ctx = canvas.getContext("2d");
+    const position =
+      getScratchPosition(event);
 
-    if (!ctx) return;
+    if (!position) return;
 
-    /*
-      Erase the scratch layer.
-    */
+    context.save();
 
-    ctx.save();
+    context.globalCompositeOperation =
+      "destination-out";
 
-    ctx.globalCompositeOperation = "destination-out";
+    context.beginPath();
 
-    ctx.beginPath();
-
-    ctx.arc(
-      x,
-      y,
+    context.arc(
+      position.x,
+      position.y,
       30,
       0,
       Math.PI * 2
     );
 
-    ctx.fill();
+    context.fill();
 
-    /*
-      Slightly wider soft scratch effect.
-    */
+    context.restore();
 
-    ctx.beginPath();
+    checkScratchProgress();
+  };
 
-    ctx.arc(
-      x,
-      y,
-      15,
-      0,
-      Math.PI * 2
-    );
+  const checkScratchProgress = () => {
+    const canvas = canvasRef.current;
 
-    ctx.fill();
+    if (!canvas) return;
 
-    ctx.restore();
+    const context = canvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
-    /*
-      Check how much of the card has been scratched.
-    */
+    if (!context) return;
 
     const width = canvas.width;
     const height = canvas.height;
 
-    const sample = ctx.getImageData(
-      0,
-      0,
-      width,
-      height
-    ).data;
+    /*
+      Check a smaller sample for performance,
+      especially on iPhone.
+    */
+
+    const sampleWidth = Math.max(
+      1,
+      Math.floor(width / 4)
+    );
+
+    const sampleHeight = Math.max(
+      1,
+      Math.floor(height / 4)
+    );
+
+    const imageData =
+      context.getImageData(
+        0,
+        0,
+        width,
+        height
+      );
 
     let transparentPixels = 0;
-    let totalPixels = 0;
 
-    const step = 12;
+    const totalPixels =
+      width * height;
 
-    for (let yPos = 0; yPos < height; yPos += step) {
-      for (let xPos = 0; xPos < width; xPos += step) {
-        const index =
-          (yPos * width + xPos) * 4;
+    /*
+      Sample every few pixels.
+    */
 
-        const alpha = sample[index + 3];
-
-        totalPixels++;
-
-        if (alpha < 80) {
-          transparentPixels++;
-        }
+    for (
+      let i = 3;
+      i < imageData.data.length;
+      i += 16
+    ) {
+      if (imageData.data[i] < 40) {
+        transparentPixels++;
       }
     }
 
-    const scratchedPercentage =
-      transparentPixels / totalPixels;
+    const estimatedPercentage =
+      (transparentPixels /
+        (totalPixels / 4)) *
+      100;
 
-    if (scratchedPercentage >= 0.45) {
+    if (estimatedPercentage >= 45) {
       setScratched(true);
 
-      /*
-        Clear the canvas completely once enough
-        of the card has been scratched.
-      */
-
-      ctx.clearRect(
+      context.clearRect(
         0,
         0,
         canvas.width,
@@ -455,35 +585,31 @@ function Baraat() {
 
     scratchingRef.current = true;
 
-    try {
-      event.currentTarget.setPointerCapture(
-        event.pointerId
-      );
-    } catch (error) {
-      // Pointer capture is not supported everywhere.
-    }
+    event.preventDefault();
 
-    scratchAt(
-      event.clientX,
-      event.clientY
-    );
+    scratch(event);
   };
 
   const handlePointerMove = (event) => {
-    if (!scratchingRef.current) return;
-    if (scratched) return;
+    if (
+      !scratchingRef.current ||
+      scratched
+    ) {
+      return;
+    }
 
-    scratchAt(
-      event.clientX,
-      event.clientY
-    );
+    event.preventDefault();
+
+    scratch(event);
   };
 
-  const stopScratching = () => {
+  const handlePointerUp = () => {
     scratchingRef.current = false;
   };
 
-  /* ---------------- CALENDAR ---------------- */
+  /* =========================
+     GOOGLE CALENDAR
+  ========================= */
 
   const addToCalendar = () => {
     const title = "Baraat Ceremony";
@@ -492,148 +618,179 @@ function Baraat() {
       "The Manor Banquet, Shahra-e-Faisal, Darwaish Colony, Karachi";
 
     const start = "20261031T210000";
+
     const end = "20261031T235900";
 
-    const calendarUrl =
-      "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      "&text=" +
-      encodeURIComponent(title) +
-      "&dates=" +
-      start +
-      "/" +
-      end +
-      "&details=" +
-      encodeURIComponent(
+    const googleCalendarUrl =
+      `https://calendar.google.com/calendar/render?action=TEMPLATE` +
+      `&text=${encodeURIComponent(title)}` +
+      `&dates=${start}/${end}` +
+      `&details=${encodeURIComponent(
         "Baraat Ceremony"
-      ) +
-      "&location=" +
-      encodeURIComponent(location) +
-      "&ctz=Asia%2FKarachi";
+      )}` +
+      `&location=${encodeURIComponent(location)}` +
+      `&ctz=Asia/Karachi`;
 
     window.open(
-      calendarUrl,
+      googleCalendarUrl,
       "_blank",
       "noopener,noreferrer"
     );
   };
 
-  /* ---------------- RENDER ---------------- */
-
   return (
     <div className="baraat-page">
 
-      {/* Hidden YouTube player */}
+      {/* =========================
+          YOUTUBE PLAYER
+      ========================= */}
+
       <div
-        className="youtube-player-container"
+        className="youtube-player-hidden"
         aria-hidden="true"
       >
         <div id="baraat-youtube-player" />
       </div>
 
-      {/* ================= OPENING ================= */}
+      {/* =========================
+          OPENING SCREEN
+      ========================= */}
 
-      <section
-        className={`opening-screen ${
-          invitationOpen ? "opening-screen-active" : ""
-        } ${
-          curtainsOpen ? "opening-screen-open" : ""
-        }`}
-      >
+      {!curtainsOpen && (
+        <section
+          className={`opening-screen ${
+            invitationOpen
+              ? "opening-screen-opening"
+              : ""
+          }`}
+        >
+          <div className="opening-glow" />
 
-        <div className="opening-content">
+          <div className="opening-content">
 
-          <div className="opening-small">
-            THE WEDDING CELEBRATION
+            <p className="opening-small">
+              THE WEDDING CELEBRATION
+            </p>
+
+            <div className="opening-ornament">
+              ❦
+            </div>
+
+            <h1 className="opening-title">
+              BARAAT
+            </h1>
+
+            <p className="opening-subtitle">
+              A Celebration of Love
+            </p>
+
+            {!invitationOpen && (
+              <button
+                type="button"
+                className="open-invitation-button"
+                onClick={openInvitation}
+              >
+                TAP TO OPEN
+              </button>
+            )}
+
           </div>
 
-          <div className="opening-ornament">
-            ❦
-          </div>
+          {/* LEFT CURTAIN */}
 
-          <h1>BARAAT</h1>
-
-          <p>A Celebration of Love</p>
-
-          {!invitationOpen && (
-            <button
-              className="open-invitation-button"
-              onClick={openInvitation}
-              type="button"
-            >
-              TAP TO OPEN
-            </button>
-          )}
-
-        </div>
-
-        <div className="curtain-container">
-
-          <div className="curtain curtain-left">
+          <div
+            className={`curtain curtain-left ${
+              curtainsOpen
+                ? "curtain-left-open"
+                : ""
+            }`}
+          >
             <div className="curtain-folds" />
-            <div className="curtain-edge" />
+            <div className="curtain-gold-edge" />
           </div>
 
-          <div className="curtain curtain-right">
+          {/* RIGHT CURTAIN */}
+
+          <div
+            className={`curtain curtain-right ${
+              curtainsOpen
+                ? "curtain-right-open"
+                : ""
+            }`}
+          >
             <div className="curtain-folds" />
-            <div className="curtain-edge" />
+            <div className="curtain-gold-edge" />
           </div>
+        </section>
+      )}
 
-        </div>
-
-      </section>
-
-      {/* ================= INVITATION ================= */}
+      {/* =========================
+          FULL INVITATION
+      ========================= */}
 
       <main
         className={`invitation ${
-          invitationOpen
+          curtainsOpen
             ? "invitation-visible"
             : ""
         }`}
       >
 
-        {/* ================= HERO ================= */}
+        {/* HERO */}
 
         <section className="hero-section">
 
-          <div className="quran-arabic">
-            ﷽
+          <div className="quran-section">
+
+            <div className="bismillah">
+              ﷽
+            </div>
+
+            <div className="quran-arabic">
+              وَخَلَقْنَاكُمْ أَزْوَاجًا
+            </div>
+
+            <div className="quran-translation">
+              “And We created you in pairs.”
+            </div>
+
+            <div className="quran-reference">
+              An-Naba | Verse 8
+            </div>
+
           </div>
 
-          <div className="quran-verse">
-            وَخَلَقْنَاكُمْ أَزْوَاجًا
+          <div className="family-section">
+
+            <h2 className="family-name">
+              Mr &amp; Mrs Advocate Ashraf Ali
+            </h2>
+
+            <p className="family-line">
+              Granddaughter of Mr &amp; Mrs Sheikh
+              Abdul Latif (Late) &amp; Mr &amp; Mrs.
+              Wasi Uddin Warsi (Late)
+            </p>
+
           </div>
 
-          <div className="quran-translation">
-            “And We created you in pairs.”
+          <div className="invite-heading">
+
+            <p className="invite-small">
+              Cordially Invite You To The
+            </p>
+
+            <h1 className="ceremony-title">
+              BARAAT CEREMONY
+            </h1>
+
+            <p className="invite-small">
+              Of Their Beloved Daughter
+            </p>
+
           </div>
 
-          <div className="quran-reference">
-            An-Naba | Verse 8
-          </div>
-
-          <div className="family-name">
-            Mr &amp; Mrs Advocate Ashraf Ali
-          </div>
-
-          <div className="family-line">
-            Granddaughter of Mr &amp; Mrs Sheikh Abdul Latif
-            (Late) &amp; Mr &amp; Mrs. Wasi Uddin Warsi (Late)
-          </div>
-
-          <div className="invite-line">
-            Cordially Invite You To The
-          </div>
-
-          <h2 className="ceremony-title">
-            BARAAT CEREMONY
-          </h2>
-
-          <div className="invite-line">
-            Of Their Beloved Daughter
-          </div>
-
-          {/* ================= PHOTOS ================= */}
+          {/* PLAIN PHOTOS — NO FRAME */}
 
           <div className="couple-photos">
 
@@ -661,41 +818,35 @@ function Baraat() {
             ONE BEAUTIFUL BEGINNING.
           </div>
 
-          <p className="intro-text">
-            With immense joy and happiness, we invite you
-            to join us as we celebrate the beautiful
-            beginning of a new journey.
-          </p>
+          <div className="hero-message">
 
-          <p className="intro-text">
-            Your presence, prayers and blessings will make
-            these precious moments even more meaningful
-            and special to us.
-          </p>
+            <p>
+              With immense joy and happiness,
+              we invite you to join us as we
+              celebrate the beautiful beginning
+              of a new journey.
+            </p>
+
+            <p>
+              Your presence, prayers and
+              blessings will make these precious
+              moments even more meaningful and
+              special to us.
+            </p>
+
+          </div>
 
         </section>
 
-        {/* ================= SCRATCH CARD ================= */}
+        {/* SCRATCH CARD */}
 
         <section className="scratch-section">
 
           <div className="scratch-card">
 
-            {!scratched && (
-              <canvas
-                ref={canvasRef}
-                className="scratch-canvas"
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={stopScratching}
-                onPointerCancel={stopScratching}
-                onPointerLeave={stopScratching}
-              />
-            )}
-
             <div className="revealed-date">
 
-              <div className="date-main">
+              <div className="date-number">
                 31 OCTOBER 2026
               </div>
 
@@ -705,30 +856,53 @@ function Baraat() {
 
             </div>
 
+            {!scratched && (
+              <canvas
+                ref={canvasRef}
+                className="scratch-canvas"
+                onPointerDown={
+                  handlePointerDown
+                }
+                onPointerMove={
+                  handlePointerMove
+                }
+                onPointerUp={
+                  handlePointerUp
+                }
+                onPointerCancel={
+                  handlePointerUp
+                }
+                onPointerLeave={
+                  handlePointerUp
+                }
+              />
+            )}
+
+            {scratched && (
+              <div className="scratch-revealed">
+
+                <div className="date-gift-message">
+                  NO BOX GIFTS PLEASE
+                </div>
+
+                <p className="gift-message">
+                  Your presence, love and
+                  blessings are more than
+                  enough for us.
+                </p>
+
+              </div>
+            )}
+
           </div>
-
-          {scratched && (
-            <div className="date-gift-message">
-
-              <div className="gift-title">
-                NO BOX GIFTS PLEASE
-              </div>
-
-              <div className="gift-text">
-                Your presence, love and blessings are
-                more than enough for us.
-              </div>
-
-            </div>
-          )}
 
         </section>
 
-        {/* ================= BARAAT ================= */}
+        {/* THE BARAAT */}
 
-        <section className="content-section">
+        <section className="content-section countdown-section">
 
-          <div className="section-kicker">
+          <div className="section-label">
             THE BARAAT
           </div>
 
@@ -765,8 +939,8 @@ function Baraat() {
           </div>
 
           <button
-            className="gold-button"
             type="button"
+            className="calendar-button"
             onClick={addToCalendar}
           >
             ADD TO CALENDAR
@@ -774,129 +948,140 @@ function Baraat() {
 
         </section>
 
-        {/* ================= VENUE ================= */}
+        {/* VENUE */}
 
-        <section className="content-section">
+        <section className="content-section venue-section">
 
-          <div className="section-kicker">
+          <div className="section-label">
             THE VENUE
           </div>
 
-          <h3>
+          <h2 className="venue-name">
             The Manor Banquet
-          </h3>
+          </h2>
 
-          <div className="venue-address">
+          <p>
             Shahra-e-Faisal
-            <br />
+          </p>
+
+          <p>
             Darwaish Colony
-            <br />
+          </p>
+
+          <p>
             Karachi
-          </div>
+          </p>
 
           <a
-            className="gold-button link-button"
             href="https://maps.app.goo.gl/9kn7oBToppmW7R9f6"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
+            className="directions-button"
           >
             VIEW DIRECTIONS
           </a>
 
         </section>
 
-        {/* ================= PROGRAMME ================= */}
+        {/* PROGRAMME */}
 
         <section className="content-section programme-section">
 
-          <div className="section-kicker">
+          <div className="section-label">
             THE PROGRAMME
           </div>
 
           <div className="programme-list">
 
             <div className="programme-item">
-              <div className="programme-time">
+
+              <span className="programme-time">
                 09:00 PM
-              </div>
+              </span>
 
-              <div className="programme-name">
+              <span className="programme-event">
                 Arrival Of Baraat
-              </div>
+              </span>
+
             </div>
 
             <div className="programme-item">
-              <div className="programme-time">
+
+              <span className="programme-time">
                 10:00 PM
-              </div>
+              </span>
 
-              <div className="programme-name">
+              <span className="programme-event">
                 Dinner
-              </div>
+              </span>
+
             </div>
 
             <div className="programme-item">
-              <div className="programme-time">
-                11:00 PM
-              </div>
 
-              <div className="programme-name">
+              <span className="programme-time">
+                11:00 PM
+              </span>
+
+              <span className="programme-event">
                 Rukhsati
-              </div>
+              </span>
+
             </div>
 
           </div>
 
         </section>
 
-        {/* ================= WELCOME ================= */}
+        {/* WELCOME */}
 
         <section className="content-section welcome-section">
 
-          <div className="section-kicker">
+          <div className="section-label">
             WELCOME
           </div>
 
           <p className="welcome-text">
-            We would be honoured to have you with us
-            as we celebrate this beautiful beginning
-            surrounded by the people we love.
+            We would be honoured to have you
+            with us as we celebrate this beautiful
+            beginning surrounded by the people
+            we love.
           </p>
 
-          <div className="large-ornament">
+          <div className="section-ornament">
             ❦
           </div>
 
         </section>
 
-        {/* ================= RSVP ================= */}
+        {/* RSVP */}
 
         <section className="content-section rsvp-section">
 
-          <div className="section-kicker">
+          <div className="section-label">
             RSVP
           </div>
 
-          <div className="rsvp-name">
+          <h2 className="rsvp-name">
             Advocate Ashraf Ali
-          </div>
+          </h2>
 
           <a
             href="tel:03342595325"
-            className="rsvp-phone"
+            className="phone-number"
           >
             03342595325
           </a>
 
-          <div className="large-ornament">
+          <div className="section-ornament">
             ❦
           </div>
 
-          <div className="with-love">
+          <p className="with-love">
             WITH LOVE &amp; BLESSINGS
-          </div>
+          </p>
 
-          <div className="large-ornament">
+          <div className="bottom-ornament">
             ❦
           </div>
 
@@ -904,26 +1089,22 @@ function Baraat() {
 
       </main>
 
-      {/* ================= MUSIC BUTTON ================= */}
+      {/* =========================
+          MUSIC BUTTON
+      ========================= */}
 
-      {invitationOpen && (
+      {curtainsOpen && (
         <button
-          className={`music-button ${
-            musicPlaying
-              ? "music-button-playing"
-              : ""
-          }`}
-          onClick={toggleMusic}
           type="button"
+          className="music-button"
+          onClick={toggleMusic}
           aria-label={
             musicPlaying
               ? "Pause music"
               : "Play music"
           }
         >
-          <span className="music-icon">
-            {musicPlaying ? "Ⅱ" : "♪"}
-          </span>
+          {musicPlaying ? "Ⅱ" : "▶"}
         </button>
       )}
 
